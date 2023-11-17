@@ -1,8 +1,8 @@
 ﻿namespace Payment.Core.Bank.Events;
 
-internal sealed class BankComunucationCompleted
+internal sealed class BankRequestFailied
 {
-    public BankComunucationCompleted(
+    public BankRequestFailied(
         Guid idPayment, string mensagem)
     {
         IdPayment = idPayment;
@@ -10,7 +10,5 @@ internal sealed class BankComunucationCompleted
     }
 
     public Guid IdPayment { get; set; }
-
-    public Guid Code { get; set; }
     public string Mensagem { get; set; }
 }

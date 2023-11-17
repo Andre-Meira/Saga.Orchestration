@@ -16,7 +16,7 @@ public static class ConfigurationWorker
     {
         string urlBank = configuration["url_api_bank"]!;
 
-        services.AddHttpClient<BankComunucationWorker>(e =>
+        services.AddHttpClient<BankWorker>(e =>
         {
             e.BaseAddress = new Uri(urlBank);
             e.DefaultRequestHeaders.Add("Accept", "application/json");

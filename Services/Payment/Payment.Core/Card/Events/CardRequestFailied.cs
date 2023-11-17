@@ -1,8 +1,8 @@
 ﻿namespace Payment.Core.Bank.Events;
 
-internal sealed class BankComunucationFailied
+internal sealed class CardRequestFailied
 {
-    public BankComunucationFailied(
+    public CardRequestFailied(
         Guid idPayment, string mensagem)
     {
         IdPayment = idPayment;

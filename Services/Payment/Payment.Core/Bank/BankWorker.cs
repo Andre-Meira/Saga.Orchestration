@@ -3,26 +3,25 @@ using Microsoft.Extensions.Logging;
 
 namespace Payment.Core.Bank;
 
-internal sealed class BankComunucationWorker : IConsumer<BankComunucation>
+internal sealed class BankWorker : IConsumer<BankCommand>
 {
-    private readonly ILogger<BankComunucationWorker> _logger;
+    private readonly ILogger<BankWorker> _logger;
     private readonly HttpClient _httpClient;
 
-    public BankComunucationWorker(
-        ILogger<BankComunucationWorker> logger, 
+    public BankWorker(
+        ILogger<BankWorker> logger, 
         HttpClient httpClient)
     {
         _logger = logger;
         _httpClient = httpClient;
     }
 
-    public Task Consume(ConsumeContext<BankComunucation> context)
-    {
-        throw new NotImplementedException();
+    public Task Consume(ConsumeContext<BankCommand> context)
+    {        
     }
 }
 
-internal sealed class WokerBankDefinition : ConsumerDefinition<BankComunucationWorker>
+internal sealed class WokerBankDefinition : ConsumerDefinition<BankWorker>
 {
     public WokerBankDefinition()
     {
@@ -31,7 +30,7 @@ internal sealed class WokerBankDefinition : ConsumerDefinition<BankComunucationW
 
     protected override void ConfigureConsumer(
         IReceiveEndpointConfigurator endpointConfigurator,
-        IConsumerConfigurator<BankComunucationWorker> consumerConfigurator,
+        IConsumerConfigurator<BankWorker> consumerConfigurator,
         IRegistrationContext context)
     {
         endpointConfigurator.UseMessageRetry(e => e.Interval(3, TimeSpan.FromSeconds(15)))        
