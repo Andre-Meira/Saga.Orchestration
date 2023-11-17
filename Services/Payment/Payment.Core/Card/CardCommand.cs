@@ -3,16 +3,13 @@
 internal sealed record BankCommand
 {
     public BankCommand(
-        Guid user, 
-        decimal value, 
-        string currencyCode)
+        Guid payeer, 
+        decimal value)
     {
-        User = user;
-        Value = value;
-        CurrencyCode = currencyCode;
+        Payeer = payeer;
+        Value = value;        
     }
 
-    public Guid User { get; init; }
-    public decimal Value { get; init; }
-    public string CurrencyCode { get; init; }
+    public Guid Payeer { get; init; }
+    public decimal Value { get; init; }    
 }

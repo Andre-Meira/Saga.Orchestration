@@ -1,8 +1,6 @@
-﻿namespace Domain.Core.Abstractions;
+﻿namespace Domain.Core.Abstractions.Stream;
 
 public interface IAggregateStream
-{    
-    Guid Guid { get; }
-
+{
     void When(IEventStream @event);
 }

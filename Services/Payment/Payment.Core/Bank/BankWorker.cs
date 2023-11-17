@@ -18,6 +18,7 @@ internal sealed class BankWorker : IConsumer<BankCommand>
 
     public Task Consume(ConsumeContext<BankCommand> context)
     {        
+        return Task.CompletedTask;
     }
 }
 
@@ -33,6 +34,6 @@ internal sealed class WokerBankDefinition : ConsumerDefinition<BankWorker>
         IConsumerConfigurator<BankWorker> consumerConfigurator,
         IRegistrationContext context)
     {
-        endpointConfigurator.UseMessageRetry(e => e.Interval(3, TimeSpan.FromSeconds(15)))        
+        endpointConfigurator.UseMessageRetry(e => e.Interval(3, TimeSpan.FromSeconds(15)));      
     }
 }

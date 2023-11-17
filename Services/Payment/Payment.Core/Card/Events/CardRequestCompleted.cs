@@ -2,15 +2,12 @@
 
 internal sealed class CardRequestCompleted
 {
-    public CardRequestCompleted(
-        Guid idPayment, string mensagem)
+    public CardRequestCompleted(Guid idPayment)
     {
-        IdPayment = idPayment;
-        Mensagem = mensagem;
+        IdPayment = idPayment;        
     }
 
     public Guid IdPayment { get; set; }
 
-    public Guid Code { get; set; }
-    public string Mensagem { get; set; }
+    public Guid Code { get; set; }    
 }

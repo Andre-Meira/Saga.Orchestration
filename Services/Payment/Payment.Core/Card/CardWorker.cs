@@ -8,9 +8,7 @@ internal sealed class CardWorker : IConsumer<CardWorker>
     private readonly ILogger<BankWorker> _logger;
     private readonly HttpClient _httpClient;
 
-    public CardWorker(
-        ILogger<BankWorker> logger, 
-        HttpClient httpClient)
+    public CardWorker(ILogger<BankWorker> logger, HttpClient httpClient)
     {
         _logger = logger;
         _httpClient = httpClient;
@@ -34,6 +32,6 @@ internal sealed class WokerCardDefinition : ConsumerDefinition<CardWorker>
         IConsumerConfigurator<CardWorker> consumerConfigurator,
         IRegistrationContext context)
     {
-        endpointConfigurator.UseMessageRetry(e => e.Interval(3, TimeSpan.FromSeconds(15)))        
+        endpointConfigurator.UseMessageRetry(e => e.Interval(3, TimeSpan.FromSeconds(15)));        
     }
 }
