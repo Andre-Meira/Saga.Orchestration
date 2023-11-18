@@ -14,10 +14,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Payment", "Payment", "{DA175CDC-0A7A-424B-8E80-B26B7680F972}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Payment.API", "Services\Payment\Payment.API\Payment.API.csproj", "{924D8C03-2734-44CC-BFBB-6760A6ED5587}"
+	ProjectSection(ProjectDependencies) = postProject
+		{83CE4EA7-4C4C-429B-A956-AF2CBE7A7926} = {83CE4EA7-4C4C-429B-A956-AF2CBE7A7926}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Payment.Core", "Services\Payment\Payment.Core\Payment.Core.csproj", "{811AD244-B8C7-49B0-B0BE-D9ADEDF66723}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Payment.Infrastructure", "Services\Payment\Payment.Infrastructure\Payment.Infrastructure.csproj", "{83CE4EA7-4C4C-429B-A956-AF2CBE7A7926}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Payment.Infrastructure", "Services\Payment\Payment.Infrastructure\Payment.Infrastructure.csproj", "{83CE4EA7-4C4C-429B-A956-AF2CBE7A7926}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

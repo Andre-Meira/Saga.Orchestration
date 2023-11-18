@@ -1,15 +1,22 @@
-﻿namespace Payment.Core.Bank;
+﻿using Domain.Contracts;
+using MassTransit;
 
-internal sealed record BankCommand
+namespace Payment.Core.Bank;
+
+[EntityName(nameof(CardCommand))]
+public sealed record CardCommand : IContract
 {
-    public BankCommand(
-        Guid payeer, 
+    public CardCommand(
+        Guid idPayment,
+        Guid payeer,
         decimal value)
     {
         Payeer = payeer;
-        Value = value;        
+        Value = value;
+        IdPayment = idPayment;
     }
 
+    public Guid IdPayment { get; init; }
     public Guid Payeer { get; init; }
-    public decimal Value { get; init; }    
+    public decimal Value { get; init; }
 }

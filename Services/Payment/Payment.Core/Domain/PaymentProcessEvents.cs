@@ -1,35 +1,38 @@
 ﻿using Domain.Core.Abstractions.Stream;
 using Microsoft.Extensions.Logging;
-using Payment.Core.Domain;
 
 namespace Payment.Core.Domain;
 
 internal sealed class PaymentProcessEvents : IProcessEventStream<PaymentEventStream>
 {
     private readonly ILogger<PaymentProcessEvents> _logger;
-    private readonly List<PaymentEventStream> _paymentAggregateStreams;    
+    private readonly IPaymentEventsRepositore _paymentEvents;
 
-    public PaymentProcessEvents(ILogger<PaymentProcessEvents> logger)
+    public PaymentProcessEvents(
+        ILogger<PaymentProcessEvents> logger,
+        IPaymentEventsRepositore paymentEvents)
     {
-        _paymentAggregateStreams = new List<PaymentEventStream>();
-        _logger = logger;        
-    }
-    
-    public Task Process(IEventStream @event)
-    {
-        PaymentEventStream paymentAggregate = new PaymentEventStream();
-        paymentAggregate.When(@event);
-        
-        return Task.CompletedTask;
+        _logger = logger;
+        _paymentEvents = paymentEvents;
     }
 
-    public PaymentEventStream? LastEvent()
+    public IEnumerable<IEventStream> GetEvents(Guid Id)
     {
-        return _paymentAggregateStreams.OrderByDescending(e => e.Date).LastOrDefault();
+        return _paymentEvents.GetEvents(Id);
     }
 
-    public IEnumerable<PaymentEventStream> GetEvents(Guid Id)
+    public async Task Include(IEventStream @event)
     {
-        throw new NotImplementedException();
+        await _paymentEvents.IncressEvent(@event).ConfigureAwait(false);
+    }
+
+    public Task<PaymentEventStream> Process(Guid Id)
+    {
+        IEnumerable<IEventStream> events = GetEvents(Id);
+        PaymentEventStream paymentEvent = new PaymentEventStream();
+
+        foreach (IEventStream @event in events) paymentEvent.When(@event);
+
+        return Task.FromResult(paymentEvent);
     }
 }

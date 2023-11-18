@@ -1,10 +1,14 @@
-﻿namespace Payment.Core.Bank;
+﻿using Domain.Contracts;
+using MassTransit;
 
-internal sealed record BankComunucation
+namespace Payment.Core.Bank;
+
+[EntityName(nameof(BankCommand))]
+public sealed record BankCommand : IContract
 {
-    public BankComunucation(
-        Guid user, 
-        decimal value, 
+    public BankCommand(
+        Guid user,
+        decimal value,
         string currencyCode)
     {
         User = user;

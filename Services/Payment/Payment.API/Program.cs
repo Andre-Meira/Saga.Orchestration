@@ -1,11 +1,37 @@
+using MassTransit;
+using Payment.Core;
+using Payment.Core.Bank;
+using Payment.Core.Orchestration;
+using Payment.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.ConfigureInfrastructure(builder.Configuration);
+builder.Services.AddWorkerService(builder.Configuration);
+
+builder.Services.AddMassTransit(e =>
+{
+    e.SetKebabCaseEndpointNameFormatter();
+
+    e.AddConsumer<OrchestrationWoker>(typeof(OrchestrationWokerDefinition));
+    e.AddConsumer<CardWorker>(typeof(CardWokerDefinition));
+    e.AddConsumer<BankWorker>(typeof(BankWorkerDefinition));
+
+    e.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("localhost", "/", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 var app = builder.Build();
 

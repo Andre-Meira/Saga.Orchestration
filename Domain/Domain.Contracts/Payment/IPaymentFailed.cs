@@ -1,7 +1,10 @@
-﻿namespace Domain.Contracts.Payment;
+﻿using MassTransit;
 
-internal interface IPaymentFailed
-{    
+namespace Domain.Contracts.Payment;
+
+[EntityName(nameof(IPaymentFailed))]
+public interface IPaymentFailed : IContract
+{
     Guid IdPayment { get; }
     string Mensagem { get; }
 }

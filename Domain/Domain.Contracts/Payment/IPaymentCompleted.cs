@@ -1,6 +1,10 @@
-﻿namespace Domain.Contracts.Payment;
+﻿using MassTransit;
 
-internal interface IPaymentCompleted
-{    
+namespace Domain.Contracts.Payment;
+
+
+[EntityName(nameof(IPaymentCompleted))]
+public interface IPaymentCompleted : IContract
+{
     Guid IdPayment { get; }
 }

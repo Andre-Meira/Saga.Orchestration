@@ -5,29 +5,26 @@ namespace Payment.Core.Domain;
 
 public sealed class PaymentEventStream : IAggregateStream
 {
-    private IEventStream? State;
-
     public Guid Guid => new Guid();
 
-    public Guid IdPayment { get; set; }    
+    public Guid IdPayment { get; set; }
     public Guid Payer { get; set; }
     public Guid Payee { get; set; }
     public decimal Value { get; set; }
 
     public Status Status { get; private set; }
     public DateTime Date => DateTime.Now;
-    public string? StateName => State?.Name;
 
     public string? Mensagem;
-    
+
     public void When(IEventStream @event)
     {
         switch (@event)
         {
             case PaymentInitialized payment:
                 Apply(payment);
-                break;          
-                
+                break;
+
             case PaymentCompleted paymentCompleted:
                 Apply(paymentCompleted);
                 break;
@@ -40,12 +37,11 @@ public sealed class PaymentEventStream : IAggregateStream
                 Apply(paymentReversed);
                 break;
         }
-    }    
-    
+    }
+
     private void Apply(PaymentInitialized @event)
     {
-        State = @event;
-        Status = Status.Process;
+        Status = @event.Status;
         IdPayment = @event.IdPayment;
         Payer = @event.Payer;
         Payee = @event.Payee;
@@ -54,21 +50,19 @@ public sealed class PaymentEventStream : IAggregateStream
 
     private void Apply(PaymentCompleted @event)
     {
-        State = @event;
-        Status = Status.Sucess;
+        Status = @event.Status;
     }
 
     private void Apply(PaymentFailed @event)
     {
-        State = @event;
         Mensagem = @event.Mensagem;
-        Status = Status.Fail;
+        Status = @event.Status;
     }
 
     private void Apply(PaymentReversed @event)
     {
-        State = @event;
-        Status = Status.Reversal;
+        Status = @event.Status;
+        Value = 0;
     }
 }
 

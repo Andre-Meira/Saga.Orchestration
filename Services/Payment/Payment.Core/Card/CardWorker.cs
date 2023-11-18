@@ -1,9 +1,10 @@
 ﻿using MassTransit;
 using Microsoft.Extensions.Logging;
+using Payment.Core.Bank.Events;
 
 namespace Payment.Core.Bank;
 
-internal sealed class CardWorker : IConsumer<CardWorker>
+public sealed class CardWorker : IConsumer<CardCommand>
 {
     private readonly ILogger<BankWorker> _logger;
     private readonly HttpClient _httpClient;
@@ -14,17 +15,17 @@ internal sealed class CardWorker : IConsumer<CardWorker>
         _httpClient = httpClient;
     }
 
-    public Task Consume(ConsumeContext<CardWorker> context)
+    public async Task Consume(ConsumeContext<CardCommand> context)
     {
-        return Task.CompletedTask;
+        await context.Publish(new CardRequestCompleted(context.Message.IdPayment));
     }
 }
 
-internal sealed class WokerCardDefinition : ConsumerDefinition<CardWorker>
+public sealed class CardWokerDefinition : ConsumerDefinition<CardWorker>
 {
-    public WokerCardDefinition()
+    public CardWokerDefinition()
     {
-        EndpointName = "queue-bank";
+        EndpointName = "queue-card";
     }
 
     protected override void ConfigureConsumer(
@@ -32,6 +33,6 @@ internal sealed class WokerCardDefinition : ConsumerDefinition<CardWorker>
         IConsumerConfigurator<CardWorker> consumerConfigurator,
         IRegistrationContext context)
     {
-        endpointConfigurator.UseMessageRetry(e => e.Interval(3, TimeSpan.FromSeconds(15)));        
+        endpointConfigurator.UseMessageRetry(e => e.Interval(3, TimeSpan.FromSeconds(15)));
     }
 }

@@ -3,9 +3,9 @@
 internal class Entity : INotificationDomain
 {
     private readonly List<Notification> _notifications = new List<Notification>();
-    
+
     private Guid _id = Guid.Empty;
-    
+
     public bool IsDeleted { get; private set; }
 
     public Guid Id { get; private set; }

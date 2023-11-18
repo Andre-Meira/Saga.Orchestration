@@ -2,9 +2,7 @@
 
 public interface IEventStream
 {
-    private object obj => this;
-
-    Guid Guid => Guid.NewGuid();
-    DateTime DataProcessed => DateTime.Now;
-    string Name => nameof(obj);
+    public Guid IdCorrelation { get; init; }
+    public DateTime DataProcessed { get; init; }
+    public string EventName { get; init; }
 }

@@ -4,10 +4,10 @@ internal sealed class CardRequestCompleted
 {
     public CardRequestCompleted(Guid idPayment)
     {
-        IdPayment = idPayment;        
+        IdPayment = idPayment;
     }
 
     public Guid IdPayment { get; set; }
 
-    public Guid Code { get; set; }    
+    public Guid Code { get; set; }
 }

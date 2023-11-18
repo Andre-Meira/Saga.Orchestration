@@ -1,8 +1,10 @@
 ﻿namespace Domain.Core.Abstractions.Stream;
 
 public interface IProcessEventStream<T>
-{    
-    Task Process(IEventStream @event);
+{
+    Task Include(IEventStream @event);
 
-    IEnumerable<T> GetEvents(Guid Id);
+    Task<T> Process(Guid Id);
+
+    IEnumerable<IEventStream> GetEvents(Guid Id);
 }
