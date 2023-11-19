@@ -1,8 +1,8 @@
 ﻿namespace Payment.Core.Bank.Events;
 
-internal sealed class CardRequestCompleted
+internal sealed class CardCompleted
 {
-    public CardRequestCompleted(Guid idPayment)
+    public CardCompleted(Guid idPayment)
     {
         IdPayment = idPayment;
     }
