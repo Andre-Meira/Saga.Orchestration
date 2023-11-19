@@ -3,6 +3,7 @@ using Domain.Contracts.Payment;
 using Domain.Core.Abstractions.Stream;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
+using Payment.API.Transfers;
 using Payment.Core.Domain;
 using System.ComponentModel.DataAnnotations;
 
@@ -23,8 +24,9 @@ public class PaymentController : ControllerBase
         _processEvent = processEvent;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> SendPayment([FromBody, Required] PaymentDTO payment)
+    [HttpPost]    
+    public async Task<IActionResult> SendPayment(
+        [FromBody, Required] PaymentTransferCommand payment)
     {
         Guid paymentId = Guid.NewGuid();
 
@@ -44,14 +46,12 @@ public class PaymentController : ControllerBase
 
 
     [HttpGet("Status/{IdPayment}")]
-    public async Task<PaymentEventStream> GetPayment(Guid IdPayment) 
-        => await _processEvent.Process(IdPayment);
+    public async Task<PaymentStatus> GetPayment(Guid IdPayment)
+    {
+        PaymentEventStream payment = await _processEvent.Process(IdPayment);
+        return new PaymentStatus(payment.IdPayment, payment.Status);
+    }
 
 }
 
-public record PaymentDTO
-{
-    public Guid Payer { get; set; }
-    public Guid Payee { get; set; }
-    public decimal Value { get; set; }
-}
+

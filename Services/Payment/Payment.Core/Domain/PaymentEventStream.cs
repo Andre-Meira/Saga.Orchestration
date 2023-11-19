@@ -2,19 +2,17 @@
 
 namespace Payment.Core.Domain;
 
-
 public sealed class PaymentEventStream : IAggregateStream
 {
-    public Guid Guid => new Guid();
+    public Guid Guid => Guid.NewGuid();
 
     public Guid IdPayment { get; set; }
     public Guid Payer { get; set; }
     public Guid Payee { get; set; }
     public decimal Value { get; set; }
-
     public Status Status { get; private set; }
-    public DateTime Date => DateTime.Now;
-
+    public string StatusName { get { return Status.ToString(); } private set { } } 
+    public DateTime Date { get; private set;}
     public string? Mensagem;
 
     public void When(IEventStream @event)
@@ -46,6 +44,7 @@ public sealed class PaymentEventStream : IAggregateStream
         Payer = @event.Payer;
         Payee = @event.Payee;
         Value = @event.Value;
+        Date = DateTime.Now;
     }
 
     private void Apply(PaymentCompleted @event)

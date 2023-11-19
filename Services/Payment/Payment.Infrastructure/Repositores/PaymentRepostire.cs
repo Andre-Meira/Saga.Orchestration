@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using Payment.Core.Domain;
 using Payment.Infrastructure.Context;
+using Payment.Infrastructure.Models;
 
 namespace Payment.Infrastructure.Repositores;
 
@@ -11,9 +12,15 @@ internal class PaymentEventsRepostiore : IPaymentEventsRepositore
     public PaymentEventsRepostiore(MongoContext context) => _context = context;
 
     public IEnumerable<IEventStream> GetEvents(Guid idPayment)
-        => _context.Eventos.Find(e => e.IdCorrelation == idPayment).ToList()
-        .OrderBy(e => e.DataProcessed);
+    {
+        List<IEventStream> events = 
+            _context.Eventos.Find(e => e.Event.IdCorrelation == idPayment).ToList()
+            .OrderBy(e => e.Event.DataProcessed).Select(e => e.Event).ToList();
 
-    public Task IncressEvent(IEventStream @event) => _context.Eventos.InsertOneAsync(@event);
+        return events;
+    }
+
+    public Task IncressEvent(IEventStream @event) 
+        => _context.Eventos.InsertOneAsync(new IEventStreamBD(@event));
 
 }
