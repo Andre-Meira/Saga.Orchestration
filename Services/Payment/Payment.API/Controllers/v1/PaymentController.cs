@@ -49,9 +49,8 @@ public class PaymentController : ControllerBase
     public async Task<PaymentStatus> GetPayment(Guid IdPayment)
     {
         PaymentEventStream payment = await _processEvent.Process(IdPayment);
-        return new PaymentStatus(payment.IdPayment, payment.Status);
-    }
-
+        return new PaymentStatus(payment.IdPayment, payment.Status, payment.Step);
+    }    
 }
 
 

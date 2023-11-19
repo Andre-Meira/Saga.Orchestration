@@ -19,10 +19,17 @@ public static class InfrastructureImplementation
         services.AddTransient<MongoContext>(e => new MongoContext(configuration));
         services.AddScoped<IPaymentEventsRepositore, PaymentEventsRepostiore>();
 
-        BsonClassMap.RegisterClassMap<PaymentInitialized>();
-        BsonClassMap.RegisterClassMap<PaymentFailed>();
+        BsonClassMap.RegisterClassMap<PaymentInitialized>();        
         BsonClassMap.RegisterClassMap<PaymentCompleted>();
         BsonClassMap.RegisterClassMap<PaymentReversed>();
+
+        BsonClassMap.RegisterClassMap<CardProcessInitialized>();
+        BsonClassMap.RegisterClassMap<CardProcessCompleted>();        
+        BsonClassMap.RegisterClassMap<CardProcessFailed>();
+
+        BsonClassMap.RegisterClassMap<BankProcessInitialized>();
+        BsonClassMap.RegisterClassMap<BankProcessCompleted>();
+        BsonClassMap.RegisterClassMap<BankProcessFailed>();
 
         return services;
     }
