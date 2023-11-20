@@ -12,10 +12,14 @@ internal class PaymentEventsRepostiore : IPaymentEventsRepositore
     public PaymentEventsRepostiore(MongoContext context) => _context = context;
 
     public IEnumerable<IEventStream> GetEvents(Guid idPayment)
-    {
-        List<IEventStream> events = 
-            _context.Eventos.Find(e => e.Event.IdCorrelation == idPayment).ToList()
-            .OrderBy(e => e.Event.DataProcessed).Select(e => e.Event).ToList();
+    {       
+        FilterDefinition<IEventStreamBD> filter = Builders<IEventStreamBD>.Filter
+            .Eq(x => x.Event.IdCorrelation, idPayment);
+
+        List<IEventStream> events = _context.Eventos.Find(filter)
+            .ToList()
+            .OrderBy(e => e.Event.DataProcessed)
+            .Select(e => e.Event).ToList();
 
         return events;
     }

@@ -16,42 +16,37 @@ public class PaymentController : ControllerBase
     private readonly ISendEndpointProvider _endpointProvider;
     private readonly IProcessEventStream<PaymentEventStream> _processEvent;
 
-    public PaymentController(
-        ISendEndpointProvider endpointProvider,
+    public PaymentController(ISendEndpointProvider endpointProvider,
         IProcessEventStream<PaymentEventStream> processEvent)
     {
         _endpointProvider = endpointProvider;
         _processEvent = processEvent;
     }
 
-    [HttpPost]    
-    public async Task<IActionResult> SendPayment(
+    [HttpPost]
+    [ProducesResponseType(typeof(PaymentResponse), StatusCodes.Status200OK)]    
+    public async Task<PaymentResponse> SendPayment(
         [FromBody, Required] PaymentTransferCommand payment)
     {
         Guid paymentId = Guid.NewGuid();
 
-        PaymentCommand paymentcommand = new PaymentCommand(
-            paymentId, payment.Payer,
+        PaymentCommand paymentcommand = new PaymentCommand(paymentId, payment.Payer,
             payment.Payee, payment.Value);
 
         ISendEndpoint sendEndpoint = await _endpointProvider.GetSendEndpoint(paymentcommand.GetExchange());
         await sendEndpoint.Send(paymentcommand).ConfigureAwait(false);
 
-        return Ok(new
-        {
-            IdPayment = paymentId,
-            Mensagem = "O pagamento esta em processo"
-        });
+        return new PaymentResponse(paymentId, "Pagamento está em processo");
     }
 
 
     [HttpGet("Status/{IdPayment}")]
+    [ProducesResponseType(typeof(PaymentResponse), StatusCodes.Status200OK)]
     public async Task<PaymentStatus> GetPayment(Guid IdPayment)
     {
         PaymentEventStream payment = await _processEvent.Process(IdPayment);
-        return new PaymentStatus(payment.IdPayment, payment.Status);
-    }
-
+        return new PaymentStatus(payment);
+    }    
 }
 
 

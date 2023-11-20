@@ -6,17 +6,14 @@ namespace Payment.Core.Bank;
 [EntityName(nameof(BankCommand))]
 public sealed record BankCommand : IContract
 {
-    public BankCommand(
-        Guid user,
-        decimal value,
-        string currencyCode)
+    public BankCommand(Guid idPayment, Guid payeer, decimal value)
     {
-        User = user;
+        IdPayment = idPayment;
+        Payeer = payeer;
         Value = value;
-        CurrencyCode = currencyCode;
     }
 
-    public Guid User { get; init; }
+    public Guid IdPayment { get; init; }
+    public Guid Payeer { get; init; }
     public decimal Value { get; init; }
-    public string CurrencyCode { get; init; }
 }
