@@ -9,6 +9,7 @@ internal class IEventStreamBD
     public IEventStreamBD(IEventStream @event)
     {
         Event = @event;
+        IdCorrelation = @event.IdCorrelation.ToString(); 
     }
 
     [BsonId]
@@ -19,4 +20,6 @@ internal class IEventStreamBD
     public MongoDB.Bson.BsonString? _t { get; set; } 
 
     public IEventStream Event { get; set; }
+
+    public string IdCorrelation { get; init; }
 }

@@ -167,7 +167,7 @@ public record BankProcessCompleted : IEventStream
     public BankProcessCompleted(Guid idPayment)
     {
         IdPayment = idPayment;
-        PaymentStep = PaymentStep.CardComplet;
+        PaymentStep = PaymentStep.BankComplet;
         DataProcessed = DateTime.Now;
         EventName = nameof(BankProcessCompleted);
         IdCorrelation = idPayment;
@@ -186,7 +186,7 @@ public record BankProcessFailed : IEventStream
     public BankProcessFailed(Guid idPayment, string message)
     {
         IdPayment = idPayment;
-        PaymentStep = PaymentStep.CardFail;
+        PaymentStep = PaymentStep.BankFail;
         DataProcessed = DateTime.Now;
         EventName = nameof(BankProcessFailed);
         IdCorrelation = idPayment;

@@ -6,6 +6,6 @@ namespace Domain.Contracts.Payment;
 [EntityName(nameof(PaymentCommand))]
 public sealed record PaymentCommand(
     Guid IdPayment,
-    Guid Payer,
+    Guid Payeer,
     Guid Payee,
     decimal Value) : IContract;
