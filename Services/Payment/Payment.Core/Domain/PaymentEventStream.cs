@@ -9,7 +9,7 @@ public sealed class PaymentEventStream : IAggregateStream
     public Guid Guid => Guid.NewGuid();
 
     public Guid IdPayment { get; set; }
-    public Guid Payer { get; set; }
+    public Guid Payeer { get; set; }
     public Guid Payee { get; set; }
     public decimal Value { get; set; }
     public Status Status { get; private set; }
@@ -71,7 +71,7 @@ public sealed class PaymentEventStream : IAggregateStream
     {
         Status = @event.Status;
         IdPayment = @event.IdPayment;
-        Payer = @event.Payer;
+        Payeer = @event.Payer;
         Payee = @event.Payee;
         Value = @event.Value;
         Date = DateTime.Now;
@@ -81,6 +81,7 @@ public sealed class PaymentEventStream : IAggregateStream
     private void Apply(PaymentCompleted @event)
     {
         Status = @event.Status;
+        Step = @event.PaymentStep;
     }
 
     private void Apply(PaymentReversed @event)
@@ -117,7 +118,7 @@ public sealed class PaymentEventStream : IAggregateStream
 
     private void Apply(BankProcessCompleted @event)
     {
-        Step = @event.PaymentStep;
+        Step = @event.PaymentStep;                
     }
 
     private void Apply(BankProcessFailed @event)

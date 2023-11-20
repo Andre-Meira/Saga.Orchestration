@@ -5,11 +5,11 @@ namespace Payment.API.Transfers;
 
 public record PaymentStatus
 {
-    public PaymentStatus(Guid idPayment, Status statusPayment, PaymentStep step)
+    public PaymentStatus(PaymentEventStream payment)
     {
-        IdPayment = idPayment;
-        StatusPayment = statusPayment.ToString();
-        StepPayment = step.GetEnumDescription();
+        IdPayment = payment.IdPayment;
+        StatusPayment = payment.Status.ToString();
+        StepPayment = payment.Step.GetEnumDescription();
     }
 
     public Guid IdPayment { get; set; }
