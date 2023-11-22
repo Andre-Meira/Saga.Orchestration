@@ -1,3 +1,4 @@
+using Domain.Core.Observability;
 using MassTransit;
 using Payment.Core;
 using Payment.Core.Bank;
@@ -9,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddTracing("Payment.API",builder.Configuration);
 
 builder.Services.ConfigureInfrastructure(builder.Configuration);
 builder.Services.AddWorkerService(builder.Configuration);
