@@ -1,12 +1,12 @@
 ﻿using Domain.Contracts.Extensions;
 using Domain.Contracts.Payment;
-using Domain.Core.Abstractions.Stream;
 using MassTransit;
 using Domain.Contracts.Bank.Events;
 using Payment.Core.Domain;
 using Domain.Contracts.Card.Events;
 using Domain.Contracts.Card;
 using Domain.Contracts.Bank;
+using Payment.Core.Domain.Events;
 
 namespace Payment.Core.Orchestration;
 
@@ -17,9 +17,12 @@ public sealed class OrchestrationWoker :
     IConsumer<BankCompleted>,
     IConsumer<BankFailed>
 {
-    private readonly IProcessEventStream<PaymentEventStream> _processEvent;
-    public OrchestrationWoker(IProcessEventStream<PaymentEventStream> processEvent)
-        => _processEvent = processEvent;
+    private readonly IPaymentProcessStream _paymentStream;
+
+    public OrchestrationWoker(IPaymentProcessStream paymentStream)
+    {
+        _paymentStream = paymentStream;
+    }
 
     public async Task Consume(ConsumeContext<PaymentCommand> context)
     {
@@ -28,14 +31,14 @@ public sealed class OrchestrationWoker :
         PaymentInitialized paymentInitialized = new PaymentInitialized(
             payment.IdPayment, payment.Payeer, payment.Payee, payment.Value);
 
-        await _processEvent.Include(paymentInitialized).ConfigureAwait(false);
+        await _paymentStream.Include(paymentInitialized).ConfigureAwait(false);
         CardCommand cardCommand = new CardCommand(payment.IdPayment, payment.Payeer, payment.Value);
 
         ISendEndpoint endpoint = await context.GetSendEndpoint(cardCommand.GetExchange());
         await endpoint.Send(cardCommand).ConfigureAwait(false);
 
         CardProcessInitialized cardProcessInitialized = new CardProcessInitialized(payment.IdPayment);
-        await _processEvent.Include(cardProcessInitialized).ConfigureAwait(false);
+        await _paymentStream.Include(cardProcessInitialized).ConfigureAwait(false);
     }
 
     async Task IConsumer<CardFailed>.Consume(ConsumeContext<CardFailed> context)
@@ -43,7 +46,7 @@ public sealed class OrchestrationWoker :
         Guid idPayment = context.Message.IdPayment;
         CardProcessFailed cardProcessFailed = new CardProcessFailed(idPayment, context.Message.Error);
 
-        await _processEvent.Include(cardProcessFailed).ConfigureAwait(false);
+        await _paymentStream.Include(cardProcessFailed).ConfigureAwait(false);
     }
 
     async Task IConsumer<CardCompleted>.Consume(ConsumeContext<CardCompleted> context)
@@ -51,16 +54,16 @@ public sealed class OrchestrationWoker :
         Guid idPayment = context.Message.IdPayment;
 
         CardProcessCompleted cardProcessCompleted = new CardProcessCompleted(idPayment);
-        await _processEvent.Include(cardProcessCompleted).ConfigureAwait(false);
+        await _paymentStream.Include(cardProcessCompleted).ConfigureAwait(false);
         
-        PaymentEventStream paymentEvent = await _processEvent.Process(idPayment);
+        PaymentStream paymentEvent = await _paymentStream.Process(idPayment);
         BankCommand bankCommand = new BankCommand(idPayment, paymentEvent.Payeer, paymentEvent.Value);        
 
         ISendEndpoint endpoint = await context.GetSendEndpoint(bankCommand.GetExchange());
         await endpoint.Send(bankCommand).ConfigureAwait(false);
 
         var bankProcessInitialized = new BankProcessInitialized(idPayment);
-        await _processEvent.Include(bankProcessInitialized).ConfigureAwait(false);
+        await _paymentStream.Include(bankProcessInitialized).ConfigureAwait(false);
     }
 
     async Task IConsumer<BankCompleted>.Consume(ConsumeContext<BankCompleted> context)
@@ -68,10 +71,10 @@ public sealed class OrchestrationWoker :
         Guid idPayment = context.Message.IdPayment;
 
         BankProcessCompleted cardProcessCompleted = new BankProcessCompleted(idPayment);
-        await _processEvent.Include(cardProcessCompleted).ConfigureAwait(false);      
+        await _paymentStream.Include(cardProcessCompleted).ConfigureAwait(false);      
         
         PaymentCompleted paymentCompleted = new PaymentCompleted(idPayment);
-        await _processEvent.Include(paymentCompleted).ConfigureAwait(false);
+        await _paymentStream.Include(paymentCompleted).ConfigureAwait(false);
     }
 
     async Task IConsumer<BankFailed>.Consume(ConsumeContext<BankFailed> context)
@@ -79,7 +82,7 @@ public sealed class OrchestrationWoker :
         Guid idPayment = context.Message.IdPayment;
         BankProcessFailed cardProcessFailed = new BankProcessFailed(idPayment, context.Message.Error);
 
-        await _processEvent.Include(cardProcessFailed).ConfigureAwait(false);
+        await _paymentStream.Include(cardProcessFailed).ConfigureAwait(false);
     }
 }
 

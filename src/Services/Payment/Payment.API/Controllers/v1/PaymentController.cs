@@ -14,10 +14,10 @@ namespace Payment.API.Controllers.v1;
 public class PaymentController : ControllerBase
 {
     private readonly ISendEndpointProvider _endpointProvider;
-    private readonly IProcessEventStream<PaymentEventStream> _processEvent;
+    private readonly IPaymentProcessStream _processEvent;
 
     public PaymentController(ISendEndpointProvider endpointProvider,
-        IProcessEventStream<PaymentEventStream> processEvent)
+        IPaymentProcessStream processEvent)
     {
         _endpointProvider = endpointProvider;
         _processEvent = processEvent;
@@ -44,9 +44,10 @@ public class PaymentController : ControllerBase
     [ProducesResponseType(typeof(PaymentResponse), StatusCodes.Status200OK)]
     public async Task<PaymentStatus> GetPayment(Guid IdPayment)
     {
-        PaymentEventStream payment = await _processEvent.Process(IdPayment);
+        PaymentStream payment = await _processEvent.Process(IdPayment);
         return new PaymentStatus(payment);
-    }    
+    }
+   
 }
 
 

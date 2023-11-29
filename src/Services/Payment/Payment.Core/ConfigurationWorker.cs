@@ -11,7 +11,7 @@ public static class ConfigurationWorker
         this IServiceCollection services,
         IConfiguration configuration)
     {        
-        services.AddScoped<IProcessEventStream<PaymentEventStream>, PaymentProcessEvents>();
+        services.AddScoped<IPaymentProcessStream, PaymentProcessStream>();
 
         return services;
     }

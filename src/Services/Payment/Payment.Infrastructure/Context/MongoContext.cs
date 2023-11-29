@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Payment.Infrastructure.Models;
-using Payment.Core.Domain;
+using Payment.Core.Domain.Events;
 
 namespace Payment.Infrastructure.Context;
 

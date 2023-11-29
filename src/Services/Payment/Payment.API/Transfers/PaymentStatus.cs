@@ -5,7 +5,7 @@ namespace Payment.API.Transfers;
 
 public record PaymentStatus
 {
-    public PaymentStatus(PaymentEventStream payment)
+    public PaymentStatus(PaymentStream payment)
     {
         IdPayment = payment.IdPayment;
         StatusPayment = payment.Status.ToString();

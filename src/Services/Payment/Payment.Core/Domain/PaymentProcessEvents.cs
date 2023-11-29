@@ -3,35 +3,38 @@ using Microsoft.Extensions.Logging;
 
 namespace Payment.Core.Domain;
 
-internal sealed class PaymentProcessEvents : IProcessEventStream<PaymentEventStream>
+public interface IPaymentProcessStream
+: IProcessorEventStream<PaymentStream, IPaymentEventStream>
+{ }
+
+internal sealed class PaymentProcessStream : IPaymentProcessStream
 {
-    private readonly ILogger<PaymentProcessEvents> _logger;
+    private readonly ILogger<PaymentProcessStream> _logger;
     private readonly IPaymentEventsRepositore _paymentEvents;
 
-    public PaymentProcessEvents(
-        ILogger<PaymentProcessEvents> logger,
+    public PaymentProcessStream(ILogger<PaymentProcessStream> logger,
         IPaymentEventsRepositore paymentEvents)
     {
         _logger = logger;
         _paymentEvents = paymentEvents;
     }
 
-    public IEnumerable<IEventStream> GetEvents(Guid Id)
+    public IEnumerable<IPaymentEventStream> GetEvents(Guid Id)
     {
         return _paymentEvents.GetEvents(Id);
     }
 
-    public async Task Include(IEventStream @event)
+    public async Task Include(IPaymentEventStream @event)
     {
         await _paymentEvents.IncressEvent(@event).ConfigureAwait(false);
     }
 
-    public Task<PaymentEventStream> Process(Guid Id)
+    public Task<PaymentStream> Process(Guid Id)
     {
-        IEnumerable<IEventStream> events = GetEvents(Id);
-        PaymentEventStream paymentEvent = new PaymentEventStream();
+        IEnumerable<IPaymentEventStream> events = GetEvents(Id);
+        PaymentStream paymentEvent = new PaymentStream();
 
-        foreach (IEventStream @event in events) paymentEvent.When(@event);
+        foreach (IPaymentEventStream @event in events) paymentEvent.When(@event);
 
         return Task.FromResult(paymentEvent);
     }

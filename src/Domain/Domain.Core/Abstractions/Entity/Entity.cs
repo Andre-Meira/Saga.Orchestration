@@ -20,7 +20,7 @@ internal class Entity : INotificationDomain
         Validate();
 
         if (_id.Equals(Guid.Empty) == false)
-            throw new DomainExceptions("já existe um id cadastrado para essa entidade.");
+            throw new DomainException("já existe um id cadastrado para essa entidade.");
 
         _id = Guid.NewGuid();
         Id = _id;
@@ -31,6 +31,6 @@ internal class Entity : INotificationDomain
     public virtual void Validate()
     {
         if (_notifications.Any() == true)
-            throw new DomainExceptions(_notifications);
+            throw new DomainException(_notifications);
     }
 }

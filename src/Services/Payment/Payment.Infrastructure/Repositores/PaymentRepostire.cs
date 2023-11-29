@@ -11,20 +11,20 @@ internal class PaymentEventsRepostiore : IPaymentEventsRepositore
     private readonly MongoContext _context;
     public PaymentEventsRepostiore(MongoContext context) => _context = context;
 
-    public IEnumerable<IEventStream> GetEvents(Guid idPayment)
+    public IEnumerable<IPaymentEventStream> GetEvents(Guid idPayment)
     {       
         FilterDefinition<IEventStreamBD> filter = Builders<IEventStreamBD>.Filter
             .Eq(x => x.Event.IdCorrelation, idPayment);
 
-        List<IEventStream> events = _context.Eventos.Find(filter)
+        List<IPaymentEventStream> events = _context.Eventos.Find(filter)
             .ToList()
             .OrderBy(e => e.Event.DataProcessed)
-            .Select(e => e.Event).ToList();
+            .Select(e => (IPaymentEventStream)e.Event).ToList();
 
         return events;
     }
 
-    public Task IncressEvent(IEventStream @event) 
+    public Task IncressEvent(IPaymentEventStream @event) 
         => _context.Eventos.InsertOneAsync(new IEventStreamBD(@event));
 
 }

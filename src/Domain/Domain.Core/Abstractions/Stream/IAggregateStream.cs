@@ -1,6 +1,6 @@
 ﻿namespace Domain.Core.Abstractions.Stream;
 
-public interface IAggregateStream
+public interface IAggregateStream<EventStream> where EventStream : IEventStream
 {
-    void When(IEventStream @event);
+    void When(EventStream @event);
 }

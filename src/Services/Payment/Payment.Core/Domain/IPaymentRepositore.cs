@@ -4,7 +4,7 @@ namespace Payment.Core.Domain;
 
 public interface IPaymentEventsRepositore
 {
-    public IEnumerable<IEventStream> GetEvents(Guid idPayment);
+    public IEnumerable<IPaymentEventStream> GetEvents(Guid idPayment);
 
-    public Task IncressEvent(IEventStream @event);
+    public Task IncressEvent(IPaymentEventStream @event);
 }
