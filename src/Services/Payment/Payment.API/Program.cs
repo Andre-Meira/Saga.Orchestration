@@ -2,6 +2,8 @@ using Domain.Core.Observability;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Payment.Core;
+using Payment.Core.Machine;
+using Payment.Core.Machine.Activitys;
 using Payment.Core.Orchestration;
 using Payment.Infrastructure;
 
@@ -25,10 +27,14 @@ builder.Services.AddMassTransit(e =>
 {
     e.SetKebabCaseEndpointNameFormatter();
     
-    e.AddConsumer<OrchestrationWoker>(typeof(OrchestrationWokerDefinition));
+    e.AddConsumer<OrchestrationWoker>(typeof(OrchestrationWokerDefinition));    
+    e.AddSagaStateMachine<PaymenteStateMachine, PaymentState>()
+        .InMemoryRepository();
+
+    e.AddActivitiesFromNamespaceContaining<CardProcessActivity>();
 
     e.UsingRabbitMq((context, cfg) =>
-    {        
+    {                
 
         cfg.Host("localhost", "/", h =>
         {

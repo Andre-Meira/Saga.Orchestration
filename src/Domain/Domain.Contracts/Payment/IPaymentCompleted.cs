@@ -3,8 +3,7 @@
 namespace Domain.Contracts.Payment;
 
 
-[EntityName(nameof(IPaymentCompleted))]
-public interface IPaymentCompleted : IContract
+public interface IPaymentCompleted 
 {
     Guid IdPayment { get; }
 }
