@@ -3,6 +3,7 @@ using MassTransit;
 using MassTransit.Courier.Contracts;
 using Payment.Core.Domain;
 using Payment.Core.Domain.Events;
+using Payment.Core.Machine.Activitys.BankActivity;
 using Payment.Core.Machine.Activitys.CardActivity;
 
 namespace Payment.Core.Orchestration;
@@ -32,15 +33,17 @@ public sealed class PaymentWoker :
         RoutingSlipBuilder builder = new RoutingSlipBuilder(NewId.NextGuid());        
 
         builder.AddActivity(nameof(CardProcessActivity), CardProcessActivity.Endpoint, context.Message);
-        builder.AddActivity(nameof(CardProcessActivity), CardProcessActivity.Endpoint, context.Message);
+        builder.AddActivity(nameof(BankProcessActivity), BankProcessActivity.Endpoint, context.Message);
 
         await builder.AddSubscription(context.SourceAddress, 
             RoutingSlipEvents.ActivityFaulted, 
-            RoutingSlipEventContents.None, NotifedFaulted);
+            RoutingSlipEventContents.None, 
+            NotifedFaulted);
 
         await builder.AddSubscription(context.SourceAddress, 
             RoutingSlipEvents.ActivityCompleted,
-            RoutingSlipEventContents.None, NotifedCompleted);
+            RoutingSlipEventContents.None, 
+            NotifedCompleted);
 
         RoutingSlip routingSlip = builder.Build();
 

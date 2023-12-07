@@ -2,6 +2,7 @@ using Domain.Core.Observability;
 using MassTransit;
 using Payment.Core;
 using Payment.Core.Machine;
+using Payment.Core.Machine.Activitys.BankActivity;
 using Payment.Core.Machine.Activitys.CardActivity;
 using Payment.Core.Orchestration;
 using Payment.Infrastructure;
@@ -35,6 +36,7 @@ builder.Services.AddMassTransit(e =>
     });
 
     e.AddActivitiesFromNamespaceContaining<CardProcessActivity>();
+    e.AddActivitiesFromNamespaceContaining<BankProcessActivity>();
 
     e.UsingRabbitMq((context, cfg) =>
     {                

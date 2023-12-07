@@ -5,8 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Payment.Core.Machine;
 
-internal sealed class OrderPaymentMachineActivity :
-    IStateMachineActivity<PaymentState, IPaymentInitialized>
+internal sealed class OrderPaymentMachineActivity : IStateMachineActivity<PaymentState, IPaymentInitialized>
 {
     private readonly ILogger<OrderPaymentMachineActivity> _logger;
 
