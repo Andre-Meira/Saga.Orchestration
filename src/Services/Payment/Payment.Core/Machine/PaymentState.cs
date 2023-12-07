@@ -12,6 +12,8 @@ public class PaymentState : SagaStateMachineInstance, ISagaVersion
 
     public decimal Value { get; set; }
 
+    public DateTime CreationDate { get; set; }
+
     public DateTime Date { get; set; }
 
     public string? FaultReason { get; set; }
