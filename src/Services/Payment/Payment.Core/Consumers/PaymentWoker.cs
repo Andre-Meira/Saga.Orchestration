@@ -6,10 +6,11 @@ using Payment.Core.Domain.Events;
 using Payment.Core.Machine.Activitys.BankActivity;
 using Payment.Core.Machine.Activitys.CardActivity;
 
-namespace Payment.Core.Orchestration;
+namespace Payment.Core.Consumers;
 
 public sealed class PaymentWoker :
-    IConsumer<PaymentCommand>,IConsumer<OrderPayment>
+    IConsumer<PaymentCommand>,
+    IConsumer<OrderPayment>
 {
     private readonly IPaymentProcessStream _paymentStream;
 
@@ -30,37 +31,43 @@ public sealed class PaymentWoker :
 
     public async Task Consume(ConsumeContext<OrderPayment> context)
     {
-        RoutingSlipBuilder builder = new RoutingSlipBuilder(NewId.NextGuid());        
+        RoutingSlipBuilder builder = new RoutingSlipBuilder(NewId.NextGuid());
 
         builder.AddActivity(nameof(CardProcessActivity), CardProcessActivity.Endpoint, context.Message);
         builder.AddActivity(nameof(BankProcessActivity), BankProcessActivity.Endpoint, context.Message);
 
-        await builder.AddSubscription(context.SourceAddress, 
-            RoutingSlipEvents.ActivityFaulted, 
-            RoutingSlipEventContents.None, 
-            NotifedFaulted);
 
-        await builder.AddSubscription(context.SourceAddress, 
+        await builder.AddSubscription(context.SourceAddress,
+            RoutingSlipEvents.ActivityFaulted,
+            RoutingSlipEventContents.Data,
+            e => NotifedFaulted(context, context.Message.IdPayment));
+
+        await builder.AddSubscription(context.SourceAddress,
             RoutingSlipEvents.ActivityCompleted,
-            RoutingSlipEventContents.None, 
-            NotifedCompleted);
+            RoutingSlipEventContents.None,
+            nameof(BankProcessActivity),
+            e => NotifedCompleted(context, context.Message.IdPayment));
 
         RoutingSlip routingSlip = builder.Build();
-
         await context.Execute(routingSlip).ConfigureAwait(false);
     }
 
-    private Task NotifedFaulted(ISendEndpoint endpoint)
+    private async Task NotifedFaulted(ConsumeContext context, Guid idPayment)
     {
-        return Task.CompletedTask;
+        await context.Publish<IPaymentFailed>(new
+        {
+            IdPayment = idPayment,
+            Message = "Não foi possivel concluir o pagamento."
+        }).ConfigureAwait(false);
     }
 
-    private Task NotifedCompleted(ISendEndpoint endpoint)
+    private async Task NotifedCompleted(ConsumeContext context, Guid idPayment)
     {
-        return Task.CompletedTask;
+        await context.Publish<IPaymentCompleted>(new { IdPayment = idPayment })
+            .ConfigureAwait(false);
     }
-
 }
+
 
 public sealed class OrchestrationWokerDefinition : ConsumerDefinition<PaymentWoker>
 {

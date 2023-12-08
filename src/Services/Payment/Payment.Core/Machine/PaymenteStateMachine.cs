@@ -11,6 +11,8 @@ public sealed class PaymenteStateMachine : MassTransitStateMachine<PaymentState>
         InstanceState(e => e.CurrentState);
 
         Event(() => PaymentInitialized, x => x.CorrelateById(m => m.Message.IdPayment));
+        Event(() => PaymentCompleted, x => x.CorrelateById(m => m.Message.IdPayment));
+        Event(() => PaymentFailed, x => x.CorrelateById(m => m.Message.IdPayment));
 
         Initially(
             When(PaymentInitialized)
@@ -29,7 +31,7 @@ public sealed class PaymenteStateMachine : MassTransitStateMachine<PaymentState>
             When(PaymentFailed)
                 .Then(context =>
                 {
-                    context.Saga.FaultReason = context.Message.Mensagem;
+                    context.Saga.FaultReason = context.Message.Message;
                     context.Saga.Date = DateTime.Now;
                 })
                 .TransitionTo(Faulted),

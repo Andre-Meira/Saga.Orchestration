@@ -33,7 +33,7 @@ public class PaymentController : ControllerBase
         PaymentCommand paymentcommand = new PaymentCommand(paymentId, payment.Payer,
             payment.Payee, payment.Value);
 
-        ISendEndpoint sendEndpoint = await _endpointProvider.GetSendEndpoint(paymentcommand.GetExchange());
+        ISendEndpoint sendEndpoint = await _endpointProvider.GetSendEndpoint(paymentcommand.GetExchange());        
         await sendEndpoint.Send(paymentcommand).ConfigureAwait(false);
 
         return new PaymentResponse(paymentId, "Pagamento está em processo");

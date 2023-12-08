@@ -5,5 +5,5 @@ namespace Domain.Contracts.Payment;
 public interface IPaymentFailed 
 {
     Guid IdPayment { get; }
-    string Mensagem { get; }
+    string Message { get; }
 }

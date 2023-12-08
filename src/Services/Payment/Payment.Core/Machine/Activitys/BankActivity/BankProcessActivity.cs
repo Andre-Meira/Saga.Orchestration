@@ -22,7 +22,7 @@ public sealed class BankProcessActivity : IActivity<BankArguments, IBankLog>
     {
         _logger.LogInformation("Bank compasated idPayment: {0}", context.Log.IdPayment);
 
-        await Task.Delay(TimeSpan.FromSeconds(10));
+        await Task.Delay(TimeSpan.FromSeconds(10));        
 
         return context.Compensated();
     }

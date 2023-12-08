@@ -1,10 +1,11 @@
 using Domain.Core.Observability;
 using MassTransit;
 using Payment.Core;
+using Payment.Core.Consumers;
 using Payment.Core.Machine;
 using Payment.Core.Machine.Activitys.BankActivity;
 using Payment.Core.Machine.Activitys.CardActivity;
-using Payment.Core.Orchestration;
+using Payment.Core.Notifications;
 using Payment.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +22,7 @@ builder.Services.AddTracing(nameService,builder.Configuration);
 
 builder.Services.ConfigureInfrastructure(builder.Configuration);
 builder.Services.AddWorkerService(builder.Configuration);
+builder.Services.AddSignalR();
 
 
 builder.Services.AddMassTransit(e =>
@@ -32,7 +34,7 @@ builder.Services.AddMassTransit(e =>
     {
         r.Connection = "mongodb://root:root@localhost:27017";
         r.DatabaseName = "Payment";
-        r.CollectionName = "Order";        
+        r.CollectionName = "PaymentMachine";        
     });
 
     e.AddActivitiesFromNamespaceContaining<CardProcessActivity>();
@@ -62,5 +64,7 @@ app.UseSwaggerUI();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<PaymentHub>("/payment-notification", configure => { });
 
 app.Run();
