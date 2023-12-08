@@ -1,25 +1,19 @@
-﻿using Domain.Contracts.Extensions;
-using Domain.Contracts.Payment;
+﻿using Domain.Contracts.Payment;
 using MassTransit;
-using Domain.Contracts.Bank.Events;
+using MassTransit.Courier.Contracts;
 using Payment.Core.Domain;
-using Domain.Contracts.Card.Events;
-using Domain.Contracts.Card;
-using Domain.Contracts.Bank;
 using Payment.Core.Domain.Events;
+using Payment.Core.Machine.Activitys.BankActivity;
+using Payment.Core.Machine.Activitys.CardActivity;
 
 namespace Payment.Core.Orchestration;
 
-public sealed class OrchestrationWoker :
-    IConsumer<PaymentCommand>,
-    IConsumer<CardFailed>,
-    IConsumer<CardCompleted>,
-    IConsumer<BankCompleted>,
-    IConsumer<BankFailed>
+public sealed class PaymentWoker :
+    IConsumer<PaymentCommand>,IConsumer<OrderPayment>
 {
     private readonly IPaymentProcessStream _paymentStream;
 
-    public OrchestrationWoker(IPaymentProcessStream paymentStream)
+    public PaymentWoker(IPaymentProcessStream paymentStream)
     {
         _paymentStream = paymentStream;
     }
@@ -31,71 +25,53 @@ public sealed class OrchestrationWoker :
         PaymentInitialized paymentInitialized = new PaymentInitialized(
             payment.IdPayment, payment.Payeer, payment.Payee, payment.Value);
 
-        await _paymentStream.Include(paymentInitialized).ConfigureAwait(false);
-        CardCommand cardCommand = new CardCommand(payment.IdPayment, payment.Payeer, payment.Value);
-
-        ISendEndpoint endpoint = await context.GetSendEndpoint(cardCommand.GetExchange());
-        await endpoint.Send(cardCommand).ConfigureAwait(false);
-
-        CardProcessInitialized cardProcessInitialized = new CardProcessInitialized(payment.IdPayment);
-        await _paymentStream.Include(cardProcessInitialized).ConfigureAwait(false);
+        await context.Publish<IPaymentInitialized>(paymentInitialized).ConfigureAwait(false); ;
     }
 
-    async Task IConsumer<CardFailed>.Consume(ConsumeContext<CardFailed> context)
+    public async Task Consume(ConsumeContext<OrderPayment> context)
     {
-        Guid idPayment = context.Message.IdPayment;
-        CardProcessFailed cardProcessFailed = new CardProcessFailed(idPayment, context.Message.Error);
+        RoutingSlipBuilder builder = new RoutingSlipBuilder(NewId.NextGuid());        
 
-        await _paymentStream.Include(cardProcessFailed).ConfigureAwait(false);
+        builder.AddActivity(nameof(CardProcessActivity), CardProcessActivity.Endpoint, context.Message);
+        builder.AddActivity(nameof(BankProcessActivity), BankProcessActivity.Endpoint, context.Message);
+
+        await builder.AddSubscription(context.SourceAddress, 
+            RoutingSlipEvents.ActivityFaulted, 
+            RoutingSlipEventContents.None, 
+            NotifedFaulted);
+
+        await builder.AddSubscription(context.SourceAddress, 
+            RoutingSlipEvents.ActivityCompleted,
+            RoutingSlipEventContents.None, 
+            NotifedCompleted);
+
+        RoutingSlip routingSlip = builder.Build();
+
+        await context.Execute(routingSlip).ConfigureAwait(false);
     }
 
-    async Task IConsumer<CardCompleted>.Consume(ConsumeContext<CardCompleted> context)
+    private Task NotifedFaulted(ISendEndpoint endpoint)
     {
-        Guid idPayment = context.Message.IdPayment;
-
-        CardProcessCompleted cardProcessCompleted = new CardProcessCompleted(idPayment);
-        await _paymentStream.Include(cardProcessCompleted).ConfigureAwait(false);
-        
-        PaymentStream paymentEvent = await _paymentStream.Process(idPayment);
-        BankCommand bankCommand = new BankCommand(idPayment, paymentEvent.Payeer, paymentEvent.Value);        
-
-        ISendEndpoint endpoint = await context.GetSendEndpoint(bankCommand.GetExchange());
-        await endpoint.Send(bankCommand).ConfigureAwait(false);
-
-        var bankProcessInitialized = new BankProcessInitialized(idPayment);
-        await _paymentStream.Include(bankProcessInitialized).ConfigureAwait(false);
+        return Task.CompletedTask;
     }
 
-    async Task IConsumer<BankCompleted>.Consume(ConsumeContext<BankCompleted> context)
+    private Task NotifedCompleted(ISendEndpoint endpoint)
     {
-        Guid idPayment = context.Message.IdPayment;
-
-        BankProcessCompleted cardProcessCompleted = new BankProcessCompleted(idPayment);
-        await _paymentStream.Include(cardProcessCompleted).ConfigureAwait(false);      
-        
-        PaymentCompleted paymentCompleted = new PaymentCompleted(idPayment);
-        await _paymentStream.Include(paymentCompleted).ConfigureAwait(false);
+        return Task.CompletedTask;
     }
 
-    async Task IConsumer<BankFailed>.Consume(ConsumeContext<BankFailed> context)
-    {
-        Guid idPayment = context.Message.IdPayment;
-        BankProcessFailed cardProcessFailed = new BankProcessFailed(idPayment, context.Message.Error);
-
-        await _paymentStream.Include(cardProcessFailed).ConfigureAwait(false);
-    }
 }
 
-public sealed class OrchestrationWokerDefinition : ConsumerDefinition<OrchestrationWoker>
+public sealed class OrchestrationWokerDefinition : ConsumerDefinition<PaymentWoker>
 {
     public OrchestrationWokerDefinition()
     {
-        EndpointName = "queue-orchestration";
+        EndpointName = "queue-payment";
     }
 
     protected override void ConfigureConsumer(
         IReceiveEndpointConfigurator endpointConfigurator,
-        IConsumerConfigurator<OrchestrationWoker> consumerConfigurator,
+        IConsumerConfigurator<PaymentWoker> consumerConfigurator,
         IRegistrationContext context)
     {
 

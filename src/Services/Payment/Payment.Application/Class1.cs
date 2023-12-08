@@ -1,7 +1,6 @@
-﻿namespace Payment.Application
-{
-    public class Class1
-    {
+﻿namespace Payment.Application;
 
-    }
+public class Class1
+{
+
 }

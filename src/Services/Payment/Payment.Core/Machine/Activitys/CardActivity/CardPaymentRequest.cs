@@ -1,6 +1,6 @@
-﻿namespace Consumer.Card;
+﻿namespace Payment.Core.Machine.Activitys.CardActivity;
 
-internal record CardPaymentRequest
+internal sealed record CardPaymentRequest
 {
     public CardPaymentRequest(Guid payeer, decimal value)
     {
