@@ -2,10 +2,9 @@
 
 namespace Domain.Contracts.Payment;
 
-
-[EntityName(nameof(PaymentCommand))]
-public sealed record PaymentCommand(
+[EntityName(nameof(ProcessPayment))]
+public record ProcessPayment(
     Guid IdPayment,
-    Guid Payeer,
-    Guid Payee,
+    Guid Payeer,    
     decimal Value) : IContract;
+

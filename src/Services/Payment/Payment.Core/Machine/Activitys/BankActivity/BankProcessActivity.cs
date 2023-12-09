@@ -22,7 +22,7 @@ public sealed class BankProcessActivity : IActivity<BankArguments, IBankLog>
     {
         _logger.LogInformation("Bank compasated idPayment: {0}", context.Log.IdPayment);
 
-        await Task.Delay(TimeSpan.FromSeconds(10));
+        await Task.Delay(TimeSpan.FromSeconds(10));        
 
         return context.Compensated();
     }
@@ -30,13 +30,12 @@ public sealed class BankProcessActivity : IActivity<BankArguments, IBankLog>
     public async Task<ExecutionResult> Execute(ExecuteContext<BankArguments> context)
     {        
         await Task.Delay(TimeSpan.FromSeconds(10));   
-
-        _logger.LogInformation("Bank process completed.");
+        
         return context.Faulted(new Exception("Falho aqui.")); //context.Completed(new { IdPayment = context.CorrelationId });
     }
 }
 
 public record BankArguments(Guid IdPayment, Guid Payeer, decimal Value)
-    : OrderPayment(IdPayment, Payeer, Value);
+    : ProcessPayment(IdPayment, Payeer, Value);
 
 public interface IBankLog { Guid IdPayment { get; set; } }

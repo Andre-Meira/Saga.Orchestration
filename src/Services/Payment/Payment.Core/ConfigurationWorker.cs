@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Payment.Core.Domain;
-using Payment.Core.Machine;
+using Payment.Core.Machine.Activitys;
 using Payment.Core.Machine.Activitys.CardActivity;
 using Polly;
 using Polly.Extensions.Http;
@@ -18,7 +18,10 @@ public static class ConfigurationWorker
     {        
         services.AddScoped<IPaymentProcessStream, PaymentProcessStream>();
         services.AddScoped<OrderPaymentMachineActivity>();
-        
+        services.AddScoped<PaymentFaliedMachineActivity>();
+        services.AddScoped<PaymentCompletedMachineActivity>();
+        //services.AddSingleton<IPaymentNotification, PaymentHub>();
+
         string urlCard = configuration["url_api_bank"]!;
 
         services.AddHttpClient<CardProcessActivity>(e =>
@@ -27,7 +30,7 @@ public static class ConfigurationWorker
                 e.DefaultRequestHeaders.Add("Accept", "application/json");
                 e.Timeout = TimeSpan.FromMinutes(1);
             })
-            .AddPolicyHandler(CreatePolicyError(5, services));
+            .AddPolicyHandler(CreatePolicyError(5, services));      
 
         return services;
     }

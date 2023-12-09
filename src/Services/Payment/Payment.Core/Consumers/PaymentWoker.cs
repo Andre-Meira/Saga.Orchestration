@@ -5,11 +5,13 @@ using Payment.Core.Domain;
 using Payment.Core.Domain.Events;
 using Payment.Core.Machine.Activitys.BankActivity;
 using Payment.Core.Machine.Activitys.CardActivity;
+using Payment.Core.Machine.Events;
 
-namespace Payment.Core.Orchestration;
+namespace Payment.Core.Consumers;
 
 public sealed class PaymentWoker :
-    IConsumer<PaymentCommand>,IConsumer<OrderPayment>
+    IConsumer<OrderPayment>,
+    IConsumer<ProcessPayment>
 {
     private readonly IPaymentProcessStream _paymentStream;
 
@@ -18,9 +20,9 @@ public sealed class PaymentWoker :
         _paymentStream = paymentStream;
     }
 
-    public async Task Consume(ConsumeContext<PaymentCommand> context)
+    public async Task Consume(ConsumeContext<OrderPayment> context)
     {
-        PaymentCommand payment = context.Message;
+        OrderPayment payment = context.Message;
 
         PaymentInitialized paymentInitialized = new PaymentInitialized(
             payment.IdPayment, payment.Payeer, payment.Payee, payment.Value);
@@ -28,39 +30,45 @@ public sealed class PaymentWoker :
         await context.Publish<IPaymentInitialized>(paymentInitialized).ConfigureAwait(false); ;
     }
 
-    public async Task Consume(ConsumeContext<OrderPayment> context)
+    public async Task Consume(ConsumeContext<ProcessPayment> context)
     {
-        RoutingSlipBuilder builder = new RoutingSlipBuilder(NewId.NextGuid());        
+        RoutingSlipBuilder builder = new RoutingSlipBuilder(NewId.NextGuid());
 
         builder.AddActivity(nameof(CardProcessActivity), CardProcessActivity.Endpoint, context.Message);
         builder.AddActivity(nameof(BankProcessActivity), BankProcessActivity.Endpoint, context.Message);
 
-        await builder.AddSubscription(context.SourceAddress, 
-            RoutingSlipEvents.ActivityFaulted, 
-            RoutingSlipEventContents.None, 
-            NotifedFaulted);
 
-        await builder.AddSubscription(context.SourceAddress, 
+        await builder.AddSubscription(context.SourceAddress,
+            RoutingSlipEvents.Faulted,
+            RoutingSlipEventContents.Data,
+            e => NotifedFaulted(e, context.Message.IdPayment));
+
+        await builder.AddSubscription(context.SourceAddress,
             RoutingSlipEvents.ActivityCompleted,
-            RoutingSlipEventContents.None, 
-            NotifedCompleted);
+            RoutingSlipEventContents.None,
+            nameof(BankProcessActivity),
+            e => NotifedCompleted(e, context.Message.IdPayment));
 
         RoutingSlip routingSlip = builder.Build();
-
         await context.Execute(routingSlip).ConfigureAwait(false);
     }
 
-    private Task NotifedFaulted(ISendEndpoint endpoint)
+    private async Task NotifedFaulted(ISendEndpoint context, Guid idPayment)
     {
-        return Task.CompletedTask;
+        await context.Send<IProcessPaymentFailed>(new
+        {
+            IdPayment = idPayment,
+            Message = "Não foi possivel concluir o pagamento."
+        }).ConfigureAwait(false);
     }
 
-    private Task NotifedCompleted(ISendEndpoint endpoint)
-    {
-        return Task.CompletedTask;
+    private async Task NotifedCompleted(ISendEndpoint context, Guid idPayment)
+    {        
+        await context.Send<IProcessPaymentCompleted>(new { IdPayment = idPayment })
+            .ConfigureAwait(false);
     }
-
 }
+
 
 public sealed class OrchestrationWokerDefinition : ConsumerDefinition<PaymentWoker>
 {

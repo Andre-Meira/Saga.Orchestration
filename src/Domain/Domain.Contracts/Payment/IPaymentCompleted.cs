@@ -2,8 +2,8 @@
 
 namespace Domain.Contracts.Payment;
 
-
+[EntityName(nameof(IPaymentCompleted))]
 public interface IPaymentCompleted 
 {
-    Guid IdPayment { get; }
+    Guid IdPayment { get; set; }
 }
