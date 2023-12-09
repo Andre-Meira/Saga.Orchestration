@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
@@ -13,10 +15,14 @@ namespace Domain.Core.Observability;
 public static class LoggerConfiguration
 {
     public static ConfigureHostBuilder AddLogginSerilog(
-        this ConfigureHostBuilder host, string nameService)
+        this ConfigureHostBuilder host, 
+        string nameService, 
+        IConfiguration configure)
     {
         host.UseSerilog((context, configuration) =>
         {
+            string? apiData = configure["EndpointSeqLogging"];
+
             configuration.WriteTo
                 .Console(outputTemplate:"[{Timestamp:HH:mm:ss} {Level:u3} {SourceContext} {Properties:j} Mensagem:{Message:lj}{NewLine}{Exception}");
             
@@ -28,6 +34,39 @@ public static class LoggerConfiguration
             configuration.Enrich.WithClientIp();
             configuration.Enrich.WithClientAgent();
             configuration.Enrich.WithProperty("name_service", nameService);
+
+            configuration.Enrich.With<TraceIdEnricher>();
+
+            if (apiData is not null) configuration.WriteTo.Seq(apiData);
+        });
+
+        return host;
+    }
+
+    public static IHostBuilder AddLogginSerilog(
+        this IHostBuilder host, string nameService, 
+        IConfiguration configure)
+    {
+        host.UseSerilog((context, configuration) =>
+        {
+            string? apiData = configure["EndpointSeqLogging"];
+
+            configuration.WriteTo
+                .Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {SourceContext} {Properties:j} Mensagem:{Message:lj}{NewLine}{Exception}");
+
+            configuration.MinimumLevel.Override("Microsoft", LogEventLevel.Error);
+            configuration.MinimumLevel.Override("Microsoft.AspNetCore.Hosting.Diagnostics", LogEventLevel.Warning);
+
+            configuration.Enrich.FromLogContext();
+            configuration.Enrich.WithExceptionDetails();
+            configuration.Enrich.WithClientIp();
+            configuration.Enrich.WithClientAgent();
+            configuration.Enrich.WithProperty("name_service", nameService);
+
+            configuration.Enrich.With<TraceIdEnricher>();
+
+            if (apiData is not null) configuration.WriteTo.Seq(apiData);
+
 
         });
 

@@ -30,8 +30,7 @@ public sealed class BankProcessActivity : IActivity<BankArguments, IBankLog>
     public async Task<ExecutionResult> Execute(ExecuteContext<BankArguments> context)
     {        
         await Task.Delay(TimeSpan.FromSeconds(10));   
-
-        _logger.LogInformation("Bank process completed.");
+        
         return context.Faulted(new Exception("Falho aqui.")); //context.Completed(new { IdPayment = context.CorrelationId });
     }
 }

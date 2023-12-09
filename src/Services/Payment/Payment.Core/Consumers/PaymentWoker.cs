@@ -38,12 +38,12 @@ public sealed class PaymentWoker :
 
 
         await builder.AddSubscription(context.SourceAddress,
-            RoutingSlipEvents.ActivityFaulted,
+            RoutingSlipEvents.Faulted,
             RoutingSlipEventContents.Data,
             e => NotifedFaulted(context, context.Message.IdPayment));
 
         await builder.AddSubscription(context.SourceAddress,
-            RoutingSlipEvents.ActivityCompleted,
+            RoutingSlipEvents.Completed,
             RoutingSlipEventContents.None,
             nameof(BankProcessActivity),
             e => NotifedCompleted(context, context.Message.IdPayment));
@@ -54,6 +54,8 @@ public sealed class PaymentWoker :
 
     private async Task NotifedFaulted(ConsumeContext context, Guid idPayment)
     {
+        if (idPayment.Equals(Guid.Empty)) return;
+
         await context.Publish<IPaymentFailed>(new
         {
             IdPayment = idPayment,
@@ -63,6 +65,8 @@ public sealed class PaymentWoker :
 
     private async Task NotifedCompleted(ConsumeContext context, Guid idPayment)
     {
+        if (idPayment.Equals(Guid.Empty)) return;
+
         await context.Publish<IPaymentCompleted>(new { IdPayment = idPayment })
             .ConfigureAwait(false);
     }

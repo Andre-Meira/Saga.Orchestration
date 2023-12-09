@@ -20,7 +20,7 @@ public static class ConfigurationWorker
     {        
         services.AddScoped<IPaymentProcessStream, PaymentProcessStream>();
         services.AddScoped<OrderPaymentMachineActivity>();
-        services.AddScoped<IPaymentNotification, PaymentHub>();
+        //services.AddSingleton<IPaymentNotification, PaymentHub>();
 
         string urlCard = configuration["url_api_bank"]!;
 

@@ -2,5 +2,5 @@
 
 public interface INotification
 {
-    public  Guid IdNotification { get; set; }
+    public  Guid IdNotification { get;}
 }

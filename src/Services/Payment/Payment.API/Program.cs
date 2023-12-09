@@ -11,7 +11,7 @@ using Payment.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 string nameService = "Payment.API";
 
-builder.Host.AddLogginSerilog(nameService);
+builder.Host.AddLogginSerilog(nameService, builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -30,12 +30,14 @@ builder.Services.AddMassTransit(e =>
     e.SetKebabCaseEndpointNameFormatter();
     
     e.AddConsumer<PaymentWoker>(typeof(OrchestrationWokerDefinition));
+    e.AddConsumer<PaymentNotification>(typeof(PaymentNotificationWokerDefinition));
+
     e.AddSagaStateMachine<PaymenteStateMachine, PaymentState>().MongoDbRepository(r =>
     {
         r.Connection = "mongodb://root:root@localhost:27017";
         r.DatabaseName = "Payment";
         r.CollectionName = "PaymentMachine";        
-    });
+    }); 
 
     e.AddActivitiesFromNamespaceContaining<CardProcessActivity>();
     e.AddActivitiesFromNamespaceContaining<BankProcessActivity>();
@@ -65,6 +67,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapHub<PaymentHub>("/payment-notification", configure => { });
+app.MapHub<PaymentHub>("/payment-notification");
 
 app.Run();

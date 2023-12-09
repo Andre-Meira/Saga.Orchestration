@@ -2,9 +2,9 @@
 
 public interface IPaymentNotification
 {
-    Task Initilized(IPaymentInitializedNotification notification);
+    Task Initilized(PaymentInitializedNotification notification);
 
-    Task Completed(IPaymentCompletedNotification notification);
+    Task Completed(PaymentCompletedNotification notification);
 
-    Task Faulted(IPaymentFailedNotification notification);
+    Task Faulted(PaymentFailedNotification notification);
 }

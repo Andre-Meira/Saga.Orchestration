@@ -1,6 +1,7 @@
 ﻿using Domain.Contracts.Notification;
 using Domain.Contracts.Payment;
 using MassTransit;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Payment.Core.Notifications;
 
@@ -12,11 +13,11 @@ public sealed class PaymentNotification :
     IConsumer<IPaymentFailed>
 
 {
-    private readonly IPaymentNotification _paymentNotification;
+    private readonly IHubContext<PaymentHub, IPaymentNotification> _paymentNotification;
     private readonly ILogger<PaymentNotification> _logger;
 
     public PaymentNotification(
-        IPaymentNotification paymentNotification, 
+        IHubContext<PaymentHub, IPaymentNotification> paymentNotification,  
         ILogger<PaymentNotification> logger)
     {
         _logger = logger;
@@ -25,35 +26,32 @@ public sealed class PaymentNotification :
 
     public async Task Consume(ConsumeContext<IPaymentInitialized> context)
     {        
-        IPaymentInitializedNotification notification = 
-            new PaymentInitializedNotification(context.Message);
+        var notification = new PaymentInitializedNotification(context.Message);
 
         _logger.LogInformation("send notification: {0} payment: {1}", 
-            nameof(notification), context.Message.IdPayment);
+            nameof(PaymentInitializedNotification), context.Message.IdPayment);
 
-        await _paymentNotification.Initilized(notification);
+        await _paymentNotification.Clients.All.Initilized(notification);
     }
 
     public async Task Consume(ConsumeContext<IPaymentCompleted> context)
     {
-        IPaymentCompletedNotification notification =
-            new PaymentCompletedNotification(context.Message);
+        var notification = new PaymentCompletedNotification(context.Message);
 
         _logger.LogInformation("send notification: {0} payment: {1}",
-            nameof(notification), context.Message.IdPayment);
+            nameof(PaymentCompletedNotification), context.Message.IdPayment);
 
-        await _paymentNotification.Completed(notification);
+        await _paymentNotification.Clients.All.Completed(notification);
     }
 
     public async Task Consume(ConsumeContext<IPaymentFailed> context)
     {
-        IPaymentFailedNotification notification =
-            new PaymentFailedNotification(context.Message);
+        var notification = new PaymentFailedNotification(context.Message);
 
         _logger.LogInformation("send notification: {0} payment: {1}",
-            nameof(notification), context.Message.IdPayment);
+            nameof(PaymentFailedNotification), context.Message.IdPayment);
 
-        await _paymentNotification.Faulted(notification);
+        await _paymentNotification.Clients.All.Faulted(notification);
     }
 }
 

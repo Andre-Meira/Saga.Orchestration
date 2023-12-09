@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Payment.Core.Notifications;
 
-public sealed class PaymentHub : Hub<IPaymentNotification>, IPaymentNotification
+public sealed class PaymentHub : Hub<IPaymentNotification>
 {    
     private readonly ILogger<PaymentHub> _logger;
 
@@ -12,16 +12,6 @@ public sealed class PaymentHub : Hub<IPaymentNotification>, IPaymentNotification
     {
         _logger = logger;
     }
-
-    public Task Completed(IPaymentCompletedNotification notification)
-        => Clients.All.Completed(notification);
-
-    public Task Faulted(IPaymentFailedNotification notification)
-        => Clients.All.Faulted(notification);
-    
-
-    public Task Initilized(IPaymentInitializedNotification notification)
-        => Clients.All.Initilized(notification);
 
     public override Task OnConnectedAsync()
     {
@@ -35,7 +25,7 @@ public sealed class PaymentHub : Hub<IPaymentNotification>, IPaymentNotification
     {
         var connectionId = Context.ConnectionId;
 
-        _logger.LogInformation("{0} connection exception {1}", connectionId, exception?.Message);        
+        _logger.LogError("{0} connection exception {1}", connectionId, exception?.Message);        
         return base.OnDisconnectedAsync(exception); 
     }
 }
