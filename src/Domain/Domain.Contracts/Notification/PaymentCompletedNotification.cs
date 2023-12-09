@@ -7,7 +7,7 @@ public record PaymentCompletedNotification :
 {
     public Guid IdNotification => Guid.NewGuid();   
 
-    public Guid IdPayment { get; }
+    public Guid IdPayment { get; set; }
 
     public PaymentCompletedNotification(IPaymentCompleted payment)
     {        

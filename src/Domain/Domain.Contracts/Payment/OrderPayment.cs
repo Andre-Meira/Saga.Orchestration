@@ -2,9 +2,10 @@
 
 namespace Domain.Contracts.Payment;
 
-[EntityName(nameof(OrderPayment))]
-public record OrderPayment(
-    Guid IdPayment,
-    Guid Payeer,    
-    decimal Value) : IContract;
 
+[EntityName(nameof(OrderPayment))]
+public sealed record OrderPayment(
+    Guid IdPayment,
+    Guid Payeer,
+    Guid Payee,
+    decimal Value) : IContract;

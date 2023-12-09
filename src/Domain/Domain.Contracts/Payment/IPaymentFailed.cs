@@ -2,8 +2,9 @@
 
 namespace Domain.Contracts.Payment;
 
+[EntityName(nameof(IPaymentFailed))]
 public interface IPaymentFailed 
 {
-    Guid IdPayment { get; }
-    string Message { get; }
+    Guid IdPayment { get; set; }
+    string Message { get; set; }
 }

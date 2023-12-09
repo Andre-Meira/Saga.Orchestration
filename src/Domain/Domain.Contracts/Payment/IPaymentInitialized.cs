@@ -1,5 +1,8 @@
-﻿namespace Domain.Contracts.Payment;
+﻿using MassTransit;
 
+namespace Domain.Contracts.Payment;
+
+[EntityName(nameof(IPaymentInitialized))]
 public interface IPaymentInitialized
 {
     Guid IdPayment { get; set; }

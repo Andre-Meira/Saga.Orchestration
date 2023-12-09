@@ -56,7 +56,7 @@ public class CardProcessActivity : IActivity<OrderCardProcessArguments, ICardPro
 }
 
 public record OrderCardProcessArguments(Guid IdPayment, Guid Payeer, decimal Value)
-    : OrderPayment(IdPayment, Payeer, Value);
+    : ProcessPayment(IdPayment, Payeer, Value);
 
 public interface ICardProcessLog
 {

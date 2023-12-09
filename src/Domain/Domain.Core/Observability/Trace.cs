@@ -40,6 +40,7 @@ public static class TraceConfiguration
 
                tracing.AddHttpClientInstrumentation();
 
+
                tracing.AddOtlpExporter(e =>
                {
                    e.Endpoint = new Uri(endpointOtlp);

@@ -7,9 +7,9 @@ public record PaymentFailedNotification :
 {
     public Guid IdNotification => Guid.NewGuid();
 
-    public Guid IdPayment { get; }
+    public Guid IdPayment { get; set; }
 
-    public string Message { get; } = string.Empty;
+    public string Message { get; set; } = string.Empty;
 
     public PaymentFailedNotification(IPaymentFailed payment)
     {        

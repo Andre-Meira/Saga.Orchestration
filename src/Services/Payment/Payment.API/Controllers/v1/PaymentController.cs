@@ -30,7 +30,7 @@ public class PaymentController : ControllerBase
     {
         Guid paymentId = Guid.NewGuid();
 
-        PaymentCommand paymentcommand = new PaymentCommand(paymentId, payment.Payer,
+        OrderPayment paymentcommand = new OrderPayment(paymentId, payment.Payer,
             payment.Payee, payment.Value);
 
         ISendEndpoint sendEndpoint = await _endpointProvider.GetSendEndpoint(paymentcommand.GetExchange());        

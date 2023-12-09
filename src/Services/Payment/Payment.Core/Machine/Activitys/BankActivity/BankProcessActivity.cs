@@ -36,6 +36,6 @@ public sealed class BankProcessActivity : IActivity<BankArguments, IBankLog>
 }
 
 public record BankArguments(Guid IdPayment, Guid Payeer, decimal Value)
-    : OrderPayment(IdPayment, Payeer, Value);
+    : ProcessPayment(IdPayment, Payeer, Value);
 
 public interface IBankLog { Guid IdPayment { get; set; } }

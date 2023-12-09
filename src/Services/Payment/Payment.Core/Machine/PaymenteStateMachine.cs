@@ -1,6 +1,8 @@
 ﻿using Domain.Contracts.Payment;
 using MassTransit;
-using Payment.Core.Domain.Events;
+using Payment.Core.Machine.Activitys;
+using Payment.Core.Machine.Events;
+using System.Reflection;
 
 namespace Payment.Core.Machine;
 
@@ -27,6 +29,7 @@ public sealed class PaymenteStateMachine : MassTransitStateMachine<PaymentState>
                 })
                 .Activity(e => e.OfType<OrderPaymentMachineActivity>())
                 .TransitionTo(Submitted));
+
         During(Submitted,
             When(PaymentFailed)
                 .Then(context =>
@@ -34,13 +37,12 @@ public sealed class PaymenteStateMachine : MassTransitStateMachine<PaymentState>
                     context.Saga.FaultReason = context.Message.Message;
                     context.Saga.Date = DateTime.Now;
                 })
+                .Activity(e => e.OfType<PaymentFaliedMachineActivity>())
                 .TransitionTo(Faulted),
 
             When(PaymentCompleted)
-                .Then(context =>
-                {
-                    context.Saga.Date = DateTime.Now;
-                })
+                .Then(context => context.Saga.Date = DateTime.Now)
+                .Activity(e => e.OfType<PaymentCompletedMachineActivity>())
                 .TransitionTo(Completed));
     }
 
@@ -50,7 +52,7 @@ public sealed class PaymenteStateMachine : MassTransitStateMachine<PaymentState>
     public State? Faulted { get; private set; }
 
     public Event<IPaymentInitialized>? PaymentInitialized { get; private set; }
-    public Event<IPaymentFailed>? PaymentFailed { get; private set; }
-    public Event<IPaymentCompleted>? PaymentCompleted { get; private set; }
+    public Event<IProcessPaymentFailed>? PaymentFailed { get; private set; }
+    public Event<IProcessPaymentCompleted>? PaymentCompleted { get; private set; }
 }
 

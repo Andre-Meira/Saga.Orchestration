@@ -1,5 +1,6 @@
 using Domain.Core.Observability;
 using MassTransit;
+using Microsoft.Extensions.Logging;
 using Payment.Core;
 using Payment.Core.Consumers;
 using Payment.Core.Machine;
@@ -7,6 +8,7 @@ using Payment.Core.Machine.Activitys.BankActivity;
 using Payment.Core.Machine.Activitys.CardActivity;
 using Payment.Core.Notifications;
 using Payment.Infrastructure;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 string nameService = "Payment.API";
@@ -40,11 +42,10 @@ builder.Services.AddMassTransit(e =>
     }); 
 
     e.AddActivitiesFromNamespaceContaining<CardProcessActivity>();
-    e.AddActivitiesFromNamespaceContaining<BankProcessActivity>();
+    e.AddActivitiesFromNamespaceContaining<BankProcessActivity>();    
 
     e.UsingRabbitMq((context, cfg) =>
-    {                
-
+    {                        
         cfg.Host("localhost", "/", h =>
         {
             h.Username("guest");
