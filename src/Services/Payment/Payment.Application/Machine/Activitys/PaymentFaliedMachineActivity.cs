@@ -1,15 +1,16 @@
 ﻿using Domain.Contracts.Payment;
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using Payment.Core.Machine.Events;
+using Payment.Application.Machine.Events;
+using Payment.Core.Domain;
 
-namespace Payment.Core.Machine.Activitys;
+namespace Payment.Application.Machine.Activitys;
 
 internal class PaymentFaliedMachineActivity :
     IStateMachineActivity<PaymentState, IProcessPaymentFailed>
 {
     private readonly ILogger<PaymentFaliedMachineActivity> _logger;
-    private readonly IPublishEndpoint _publishEndpoint;
+    private readonly IPublishEndpoint _publishEndpoint;    
 
     public PaymentFaliedMachineActivity(
         IPublishEndpoint publishEndpoint,

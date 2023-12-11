@@ -2,13 +2,13 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Payment.Application.Machine.Activitys;
+using Payment.Application.Machine.Activitys.CardActivity;
 using Payment.Core.Domain;
-using Payment.Core.Machine.Activitys;
-using Payment.Core.Machine.Activitys.CardActivity;
 using Polly;
 using Polly.Extensions.Http;
 
-namespace Payment.Core;
+namespace Payment.Application;
 
 public static class ConfigurationWorker
 {

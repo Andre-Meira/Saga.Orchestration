@@ -30,29 +30,14 @@ public sealed class PaymentStream :
 
 public enum PaymentStep {
 
-    [Description("Info Validation")]
-    InfoValidation,
-
-    [Description("Card Processing")]
-    CardProcessing,
-
-    [Description("Card Complet")]
-    CardComplet,
-
-    [Description("Card Fail")]
-    CardFail,
-
-    [Description("Bank Processing")]
-    BankProcessing,
-
-    [Description("Bank Complet")]
-    BankComplet,
-
-    [Description("Bank Fail")]
-    BankFail,
+    [Description("Process")]
+    Process,    
 
     [Description("Complet")]   
     Complet,
+
+    [Description("Fail")]
+    Fail,
 
     [Description("Reversal")]
     Reversal
@@ -63,6 +48,5 @@ public enum Status
     Process,
     Complet,
     Fail,
-    Reversal,
-    Retry
+    Reversal
 }

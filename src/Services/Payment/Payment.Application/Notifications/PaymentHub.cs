@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
-namespace Payment.Core.Notifications;
+namespace Payment.Application.Notifications;
 
 public sealed class PaymentHub : Hub<IPaymentNotification>
 {    

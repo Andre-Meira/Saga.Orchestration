@@ -1,4 +1,4 @@
-﻿namespace Payment.Core.Machine.Activitys.CardActivity;
+﻿namespace Payment.Application.Machine.Activitys.CardActivity;
 
 internal sealed record CardPaymentRequest
 {

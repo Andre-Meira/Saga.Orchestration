@@ -1,14 +1,12 @@
 using Domain.Core.Observability;
 using MassTransit;
-using Microsoft.Extensions.Logging;
-using Payment.Core;
-using Payment.Core.Consumers;
-using Payment.Core.Machine;
-using Payment.Core.Machine.Activitys.BankActivity;
-using Payment.Core.Machine.Activitys.CardActivity;
-using Payment.Core.Notifications;
+using Payment.Application.Consumers;
+using Payment.Application.Machine;
+using Payment.Application.Machine.Activitys.BankActivity;
+using Payment.Application.Machine.Activitys.CardActivity;
+using Payment.Application.Notifications;
 using Payment.Infrastructure;
-using Serilog;
+using Payment.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 string nameService = "Payment.API";

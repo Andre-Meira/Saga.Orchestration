@@ -1,4 +1,4 @@
-﻿namespace Payment.Core.Machine.Events;
+﻿namespace Payment.Application.Machine.Events;
 
 public interface IProcessPaymentCompleted
 {

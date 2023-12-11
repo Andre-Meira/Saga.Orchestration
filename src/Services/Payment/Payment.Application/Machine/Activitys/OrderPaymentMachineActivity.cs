@@ -3,7 +3,7 @@ using Domain.Contracts.Payment;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
-namespace Payment.Core.Machine.Activitys;
+namespace Payment.Application.Machine.Activitys;
 
 internal sealed class OrderPaymentMachineActivity : IStateMachineActivity<PaymentState, IPaymentInitialized>
 {
@@ -22,7 +22,7 @@ internal sealed class OrderPaymentMachineActivity : IStateMachineActivity<Paymen
     public async Task Execute(BehaviorContext<PaymentState, IPaymentInitialized> context,
         IBehavior<PaymentState, IPaymentInitialized> next)
     {
-        _logger.LogInformation("Processando ordem {0}", context.Saga.CorrelationId);
+        _logger.LogInformation("Process order {0}", context.Saga.CorrelationId);
 
         ProcessPayment order = new ProcessPayment(context.Saga.CorrelationId,
             context.Saga.Payeer, context.Saga.Value);

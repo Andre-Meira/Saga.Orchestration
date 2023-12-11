@@ -15,7 +15,7 @@ public record PaymentInitialized : IPaymentEventStream
         Status = Status.Process;
         DataProcessed = DateTime.Now;
         IdCorrelation = idPayment;
-        PaymentStep = PaymentStep.InfoValidation;
+        PaymentStep = PaymentStep.Process;
     }
 
     public Guid IdPayment { get; init; }
@@ -60,7 +60,7 @@ public record PaymentCompleted : IPaymentEventStream
 
     public void Process(PaymentStream stream)
     {
-        if (stream.Step is not PaymentStep.BankComplet)
+        if (stream.Step is not PaymentStep.Complet)
             throw new DomainException("Não é possivel finalizar o pagamento em quanto a banco não termina.");
 
         stream.Step = PaymentStep;  

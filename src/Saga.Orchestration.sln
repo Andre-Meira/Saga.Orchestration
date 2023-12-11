@@ -24,7 +24,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Payment.Infrastructure", "S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Payment.Application", "Services\Payment\Payment.Application\Payment.Application.csproj", "{9B5C16C6-1C4E-4912-B691-6E04D21F73E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService", "Services\NotificationService\NotificationService.csproj", "{095692FF-20D4-43AA-84B1-C06FBADEBDED}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification", "Services\Notification\Notification.csproj", "{095692FF-20D4-43AA-84B1-C06FBADEBDED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

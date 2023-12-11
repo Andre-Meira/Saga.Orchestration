@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Text;
 
-namespace Payment.Core.Machine.Activitys.CardActivity;
+namespace Payment.Application.Machine.Activitys.CardActivity;
     
 public class CardProcessActivity : IActivity<OrderCardProcessArguments, ICardProcessLog>
 {
@@ -32,6 +32,8 @@ public class CardProcessActivity : IActivity<OrderCardProcessArguments, ICardPro
 
     public async Task<ExecutionResult> Execute(ExecuteContext<OrderCardProcessArguments> context)
     {
+        _logger.LogInformation("Card process started id payment: {0}", context.Arguments.IdPayment);
+
         OrderCardProcessArguments arguments = context.Arguments;
         Uri urlApi = new(_httpClient.BaseAddress!.ToString());
 
@@ -43,13 +45,13 @@ public class CardProcessActivity : IActivity<OrderCardProcessArguments, ICardPro
 
         if (responseMessage.IsSuccessStatusCode)
         {
-            _logger.LogInformation("Card process completed.");
+            _logger.LogInformation("Card process completed id payment: {0}", context.Arguments.IdPayment);
             return context.Completed(new { IdPayment = context.CorrelationId});
         }
 
         string body = await responseMessage.Content.ReadAsStringAsync();
-        _logger.LogWarning("Card process Faulted response:{0}, code:{1}",
-                body, responseMessage.StatusCode);        
+        _logger.LogWarning("Card process Faulted, id payment:{0} response:{1}, code:{2}",
+                context.Arguments.IdPayment, body, responseMessage.StatusCode);        
 
         return context.Faulted();
     }

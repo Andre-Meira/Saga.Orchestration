@@ -3,9 +3,9 @@ using Domain.Contracts.Payment;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
-using Payment.Core.Notifications;
+using Payment.Application.Notifications;
 
-namespace Payment.Core.Consumers;
+namespace Payment.Application.Consumers;
 
 public sealed class PaymentNotification :
     IConsumer<IPaymentInitialized>,

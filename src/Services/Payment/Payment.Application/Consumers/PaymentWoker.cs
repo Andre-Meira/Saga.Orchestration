@@ -1,13 +1,13 @@
 ﻿using Domain.Contracts.Payment;
 using MassTransit;
 using MassTransit.Courier.Contracts;
+using Payment.Application.Machine.Activitys.BankActivity;
+using Payment.Application.Machine.Activitys.CardActivity;
+using Payment.Application.Machine.Events;
 using Payment.Core.Domain;
 using Payment.Core.Domain.Events;
-using Payment.Core.Machine.Activitys.BankActivity;
-using Payment.Core.Machine.Activitys.CardActivity;
-using Payment.Core.Machine.Events;
 
-namespace Payment.Core.Consumers;
+namespace Payment.Application.Consumers;
 
 public sealed class PaymentWoker :
     IConsumer<OrderPayment>,

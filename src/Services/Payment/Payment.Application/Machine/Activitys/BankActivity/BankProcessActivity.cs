@@ -2,7 +2,7 @@
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
-namespace Payment.Core.Machine.Activitys.BankActivity;
+namespace Payment.Application.Machine.Activitys.BankActivity;
 
 public sealed class BankProcessActivity : IActivity<BankArguments, IBankLog>
 {
@@ -28,7 +28,9 @@ public sealed class BankProcessActivity : IActivity<BankArguments, IBankLog>
     }
 
     public async Task<ExecutionResult> Execute(ExecuteContext<BankArguments> context)
-    {        
+    {
+        _logger.LogInformation("Bank process started id payment: {0}", context.Arguments.IdPayment);
+
         await Task.Delay(TimeSpan.FromSeconds(10));   
         
         return context.Faulted(new Exception("Falho aqui.")); //context.Completed(new { IdPayment = context.CorrelationId });

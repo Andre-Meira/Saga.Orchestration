@@ -7,7 +7,7 @@ public interface IPaymentProcessStream
 : IProcessorEventStream<PaymentStream, IPaymentEventStream>
 { }
 
-internal sealed class PaymentProcessStream : IPaymentProcessStream
+public sealed class PaymentProcessStream : IPaymentProcessStream
 {
     private readonly ILogger<PaymentProcessStream> _logger;
     private readonly IPaymentEventsRepositore _paymentEvents;

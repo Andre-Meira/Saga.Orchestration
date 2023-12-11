@@ -1,10 +1,9 @@
 ﻿using Domain.Contracts.Payment;
 using MassTransit;
-using Payment.Core.Machine.Activitys;
-using Payment.Core.Machine.Events;
-using System.Reflection;
+using Payment.Application.Machine.Activitys;
+using Payment.Application.Machine.Events;
 
-namespace Payment.Core.Machine;
+namespace Payment.Application.Machine;
 
 public sealed class PaymenteStateMachine : MassTransitStateMachine<PaymentState>
 {

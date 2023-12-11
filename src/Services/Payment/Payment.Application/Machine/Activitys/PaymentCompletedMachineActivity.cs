@@ -1,9 +1,9 @@
 ﻿using Domain.Contracts.Payment;
 using MassTransit;
 using Microsoft.Extensions.Logging;
-using Payment.Core.Machine.Events;
+using Payment.Application.Machine.Events;
 
-namespace Payment.Core.Machine.Activitys;
+namespace Payment.Application.Machine.Activitys;
 
 internal sealed class PaymentCompletedMachineActivity :
     IStateMachineActivity<PaymentState, IProcessPaymentCompleted>
