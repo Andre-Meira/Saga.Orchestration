@@ -35,14 +35,14 @@ public sealed class PaymenteStateMachine : MassTransitStateMachine<PaymentState>
                 {
                     context.Saga.FaultReason = context.Message.Message;
                     context.Saga.Date = DateTime.Now;
-                })
+                })                
                 .Activity(e => e.OfType<PaymentFaliedMachineActivity>())
                 .TransitionTo(Faulted),
 
             When(PaymentCompleted)
-                .Then(context => context.Saga.Date = DateTime.Now)
+                .Then(context => context.Saga.Date = DateTime.Now)                
                 .Activity(e => e.OfType<PaymentCompletedMachineActivity>())
-                .TransitionTo(Completed));
+                .TransitionTo(Completed));                
     }
 
     public State? Submitted { get; private set; }

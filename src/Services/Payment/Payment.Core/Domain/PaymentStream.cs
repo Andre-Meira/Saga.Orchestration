@@ -11,8 +11,7 @@ public sealed class PaymentStream :
     public Guid Payeer { get; set; }
     public Guid Payee { get; set; }
     public decimal Value { get; set; }
-    public Status Status { get; set; }
-    public PaymentStep Step { get; set; }    
+    public Status Status { get; set; }      
 
     public DateTime Date { get; set; }
     public string? Message { get; set; }    
@@ -25,22 +24,6 @@ public sealed class PaymentStream :
 
     public void When(IPaymentEventStream @event) => @event.Process(this);
 
-}
-
-
-public enum PaymentStep {
-
-    [Description("Process")]
-    Process,    
-
-    [Description("Complet")]   
-    Complet,
-
-    [Description("Fail")]
-    Fail,
-
-    [Description("Reversal")]
-    Reversal
 }
 
 public enum Status

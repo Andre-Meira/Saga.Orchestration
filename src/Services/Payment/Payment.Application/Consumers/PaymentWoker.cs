@@ -24,8 +24,10 @@ public sealed class PaymentWoker :
     {
         OrderPayment payment = context.Message;
 
-        PaymentInitialized paymentInitialized = new PaymentInitialized(
+        PaymentProcessInitialized paymentInitialized = new PaymentProcessInitialized(
             payment.IdPayment, payment.Payeer, payment.Payee, payment.Value);
+
+        await _paymentStream.Include(paymentInitialized).ConfigureAwait(false);
 
         await context.Publish<IPaymentInitialized>(paymentInitialized).ConfigureAwait(false); ;
     }

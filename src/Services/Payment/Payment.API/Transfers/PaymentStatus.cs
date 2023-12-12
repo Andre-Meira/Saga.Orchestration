@@ -8,11 +8,12 @@ public record PaymentStatus
     public PaymentStatus(PaymentStream payment)
     {
         IdPayment = payment.IdPayment;
-        StatusPayment = payment.Status.ToString();
-        StepPayment = payment.Step.GetEnumDescription();
+        Status = payment.Status.ToString();        
+        Message = payment.Message;
     }
 
     public Guid IdPayment { get; set; }
-    public string StatusPayment { get; set; }
-    public string StepPayment { get; set; }
+    public string Status { get; set; }    
+
+    public string? Message { get; set; }
 }

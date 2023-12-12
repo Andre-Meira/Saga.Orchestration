@@ -3,6 +3,7 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using Payment.Application.Machine.Events;
 using Payment.Core.Domain;
+using Payment.Core.Domain.Events;
 
 namespace Payment.Application.Machine.Activitys;
 
@@ -10,14 +11,15 @@ internal class PaymentFaliedMachineActivity :
     IStateMachineActivity<PaymentState, IProcessPaymentFailed>
 {
     private readonly ILogger<PaymentFaliedMachineActivity> _logger;
-    private readonly IPublishEndpoint _publishEndpoint;    
+    private readonly IPublishEndpoint _publishEndpoint;
+    private readonly IPaymentProcessStream _paymentProcess;
 
-    public PaymentFaliedMachineActivity(
-        IPublishEndpoint publishEndpoint,
-        ILogger<PaymentFaliedMachineActivity> logger)
+    public PaymentFaliedMachineActivity(ILogger<PaymentFaliedMachineActivity> logger, 
+        IPublishEndpoint publishEndpoint, IPaymentProcessStream paymentProcess)
     {
         _logger = logger;
         _publishEndpoint = publishEndpoint;
+        _paymentProcess = paymentProcess;
     }
 
     public void Accept(StateMachineVisitor visitor) => visitor.Visit(this);
@@ -26,14 +28,17 @@ internal class PaymentFaliedMachineActivity :
     public async Task Execute(BehaviorContext<PaymentState, IProcessPaymentFailed> context,
         IBehavior<PaymentState, IProcessPaymentFailed> next)
     {
-        _logger.LogInformation("Payment failed id:{0}", context.Message.IdPayment);
+        Guid idPayment = context.Message.IdPayment;
+        string message = context.Message.Message;
 
-        await _publishEndpoint.Publish<IPaymentFailed>(new 
-        { 
-            context.Message.IdPayment,
-            context.Message.Message,  
-        })
-        .ConfigureAwait(false);
+        _logger.LogInformation("Payment failed id:{0}", idPayment);
+
+        await _paymentProcess.Include(new PaymentProcessFailed(idPayment, message));
+        
+        await _publishEndpoint.Publish<IPaymentFailed>(new { idPayment,message })
+            .ConfigureAwait(false);
+
+        await next.Execute(context);
     }
 
     public Task Faulted<TException>(

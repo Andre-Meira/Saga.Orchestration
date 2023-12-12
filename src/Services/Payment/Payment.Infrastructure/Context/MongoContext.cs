@@ -30,17 +30,11 @@ internal sealed class MongoContextConfiguration
     {
         BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.CSharpLegacy));
 
-        BsonClassMap.RegisterClassMap<PaymentInitialized>();
-        BsonClassMap.RegisterClassMap<PaymentCompleted>();
-        BsonClassMap.RegisterClassMap<PaymentReversed>();
+        BsonClassMap.RegisterClassMap<PaymentProcessInitialized>();
+        BsonClassMap.RegisterClassMap<PaymentProcessFailed>();
+        BsonClassMap.RegisterClassMap<PaymentProcessCompleted>();
+        BsonClassMap.RegisterClassMap<PaymentProcessReversed>();
 
-        BsonClassMap.RegisterClassMap<CardProcessInitialized>();
-        BsonClassMap.RegisterClassMap<CardProcessCompleted>();
-        BsonClassMap.RegisterClassMap<CardProcessFailed>();
-
-        BsonClassMap.RegisterClassMap<BankProcessInitialized>();
-        BsonClassMap.RegisterClassMap<BankProcessCompleted>();
-        BsonClassMap.RegisterClassMap<BankProcessFailed>();
     }
 }
 

@@ -2,21 +2,24 @@
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using Payment.Application.Machine.Events;
+using Payment.Core.Domain;
+using Payment.Core.Domain.Events;
 
 namespace Payment.Application.Machine.Activitys;
 
 internal sealed class PaymentCompletedMachineActivity :
     IStateMachineActivity<PaymentState, IProcessPaymentCompleted>
 {
-    private readonly ILogger<PaymentCompletedMachineActivity> _logger;  
+    private readonly ILogger<PaymentCompletedMachineActivity> _logger;
     private readonly IPublishEndpoint _publishEndpoint;
+    private readonly IPaymentProcessStream _paymentProcess;    
 
-    public PaymentCompletedMachineActivity(
-        IPublishEndpoint publishEndpoint, 
-        ILogger<PaymentCompletedMachineActivity> logger)
+    public PaymentCompletedMachineActivity(ILogger<PaymentCompletedMachineActivity> logger, 
+        IPublishEndpoint publishEndpoint, IPaymentProcessStream paymentProcess)
     {
         _logger = logger;
         _publishEndpoint = publishEndpoint;
+        _paymentProcess = paymentProcess;
     }
 
     public void Accept(StateMachineVisitor visitor) => visitor.Visit(this);
@@ -25,10 +28,16 @@ internal sealed class PaymentCompletedMachineActivity :
     public async Task Execute(BehaviorContext<PaymentState, IProcessPaymentCompleted> context, 
         IBehavior<PaymentState, IProcessPaymentCompleted> next)
     {
-        _logger.LogInformation("Payment completed id:{0}", context.Message.IdPayment);
+        Guid idPayment = context.Message.IdPayment;
 
-        await _publishEndpoint.Publish<IPaymentCompleted>(new {context.Message.IdPayment})
+        _logger.LogInformation("Payment completed id:{0}", idPayment);
+
+        await _paymentProcess.Include(new PaymentProcessCompleted(idPayment, "Pagamento realizado."));
+
+        await _publishEndpoint.Publish<IPaymentCompleted>(new {idPayment})
             .ConfigureAwait(false);
+
+        await next.Execute(context);
     }
 
     public Task Faulted<TException>(
