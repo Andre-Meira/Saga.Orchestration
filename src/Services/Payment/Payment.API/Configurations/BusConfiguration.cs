@@ -27,7 +27,7 @@ public static class BusConfiguration
                 .MongoDbRepository(r =>
                 {
                     r.Connection = mongoOptions.Connection;
-                    r.DatabaseName = mongoOptions.Connection;
+                    r.DatabaseName = mongoOptions.DatabaseName;
                     r.CollectionName = nameof(PaymenteStateMachine);
                 });
 

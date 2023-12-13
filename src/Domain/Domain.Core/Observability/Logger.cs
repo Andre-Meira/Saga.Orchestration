@@ -28,6 +28,7 @@ public static class LoggerConfiguration
             
             configuration.MinimumLevel.Override("Microsoft", LogEventLevel.Error);
             configuration.MinimumLevel.Override("Microsoft.AspNetCore.Hosting.Diagnostics", LogEventLevel.Warning);
+            configuration.MinimumLevel.Override("MassTransit", LogEventLevel.Warning);
             
             configuration.Enrich.FromLogContext();            
             configuration.Enrich.WithExceptionDetails();
