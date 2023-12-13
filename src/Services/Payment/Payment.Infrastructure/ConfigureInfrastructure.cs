@@ -17,7 +17,7 @@ public static class InfrastructureImplementation
         BsonSerializer.RegisterSerializer(objectSerializer);
 
         MongoContextConfiguration.RegisterConfig();   
-        services.AddTransient<MongoContext>(e => new MongoContext(configuration));
+        services.AddTransient<MongoContext>();
         services.AddScoped<IPaymentEventsRepositore, PaymentEventsRepostiore>();
 
 

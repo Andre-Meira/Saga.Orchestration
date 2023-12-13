@@ -1,5 +1,6 @@
 ﻿using Domain.Contracts.Notification;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -8,10 +9,14 @@ namespace Notification;
 internal sealed class HandlerNotification : BackgroundService
 {
     private readonly ILogger<HandlerNotification> _logger;
+    private readonly IConfiguration _configuration;    
 
-    public HandlerNotification(ILogger<HandlerNotification> logger)
+    public HandlerNotification(
+        ILogger<HandlerNotification> logger, 
+        IConfiguration configuration)
     {
         _logger = logger;
+        _configuration = configuration;
     }
 
     public Task PaymentInitilized(PaymentInitializedNotification notification)
@@ -42,7 +47,7 @@ internal sealed class HandlerNotification : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var connection = new HubConnectionBuilder()
-            .WithUrl("http://localhost:5212/payment-notification")           
+            .WithUrl(_configuration["UrlPaymentNotification"]!)           
             .Build();        
 
         connection.On<PaymentInitializedNotification>("Initilized", PaymentInitilized);

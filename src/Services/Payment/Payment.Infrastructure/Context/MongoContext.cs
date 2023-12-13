@@ -5,6 +5,8 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Payment.Infrastructure.Models;
 using Payment.Core.Domain.Events;
+using Microsoft.Extensions.Options;
+using Domain.Core.Options;
 
 namespace Payment.Infrastructure.Context;
 
@@ -14,10 +16,10 @@ internal sealed class MongoContext
     public IMongoCollection<IEventStreamBD> Eventos
         => _database.GetCollection<IEventStreamBD>("Eventos");
 
-    public MongoContext(IConfiguration configuration)
+    public MongoContext(IOptions<MongoOptions> options)
     {
-        string connection = configuration["stringMongo"]!;
-        string dataBaseName = configuration["dataBaseName"]!;
+        string connection = options.Value.Connection;
+        string dataBaseName = options.Value.DatabaseName;
 
         var client = new MongoClient(connection);
         _database = client.GetDatabase(dataBaseName);       
