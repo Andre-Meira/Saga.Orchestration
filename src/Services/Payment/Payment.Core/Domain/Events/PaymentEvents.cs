@@ -58,10 +58,7 @@ public record PaymentProcessCompleted : IPaymentEventStream
     public Guid IdCorrelation { get; init; }
 
     public void Process(PaymentStream stream)
-    {
-        if (stream.Status is not Status.Complet)
-            throw new DomainException("Não é possivel finalizar o pagamento em quanto a banco não termina.");
-        
+    {                
         stream.Status = Status;
         stream.Message = Message;   
     }

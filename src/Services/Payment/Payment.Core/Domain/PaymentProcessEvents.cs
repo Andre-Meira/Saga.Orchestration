@@ -8,14 +8,11 @@ public interface IPaymentProcessStream
 { }
 
 public sealed class PaymentProcessStream : IPaymentProcessStream
-{
-    private readonly ILogger<PaymentProcessStream> _logger;
+{    
     private readonly IPaymentEventsRepositore _paymentEvents;
 
-    public PaymentProcessStream(ILogger<PaymentProcessStream> logger,
-        IPaymentEventsRepositore paymentEvents)
-    {
-        _logger = logger;
+    public PaymentProcessStream(IPaymentEventsRepositore paymentEvents)
+    {        
         _paymentEvents = paymentEvents;
     }
 
@@ -26,6 +23,9 @@ public sealed class PaymentProcessStream : IPaymentProcessStream
 
     public async Task Include(IPaymentEventStream @event)
     {
+        PaymentStream stream = await Process(@event.IdCorrelation);
+        stream.When(@event);
+
         await _paymentEvents.IncressEvent(@event).ConfigureAwait(false);
     }
 
