@@ -36,7 +36,7 @@ public class PaymentController : ControllerBase
         ISendEndpoint sendEndpoint = await _endpointProvider.GetSendEndpoint(paymentcommand.GetExchange());        
         await sendEndpoint.Send(paymentcommand).ConfigureAwait(false);
 
-        return new PaymentResponse(paymentId, "Pagamento está em processo");
+        return new PaymentResponse(paymentId, "Pagamento está em processo.");
     }
 
 
@@ -47,7 +47,16 @@ public class PaymentController : ControllerBase
         PaymentStream payment = await _processEvent.Process(IdPayment);
         return new PaymentStatus(payment);
     }
-   
+
+    [HttpPost("Reverse/{IdPayment}")]
+    [ProducesResponseType(typeof(PaymentResponse), StatusCodes.Status200OK)]
+    public async Task<PaymentResponse> ReversePayment(Guid IdPayment,
+        [FromBody,Required] string message)
+    {
+        return new PaymentResponse(IdPayment, "O estorno está em processo.");
+    }
+
+
 }
 
 
